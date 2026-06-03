@@ -1,0 +1,1685 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Nova — Meal Ideas</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<link href="https://cdn.jsdelivr.net/npm/@fontsource/bebas-neue@4.5.0/index.css" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0a0a0a;--surface:#131313;--surface2:#1c1c1c;--surface3:#242424;
+  --border:#2a2a2a;--border2:#333;--orange:#f97316;--orange-dim:#c2570e;
+  --orange-soft:rgba(249,115,22,0.08);--text:#f0f0f0;--muted:#888;--muted2:#555;
+  --radius:10px;--radius-lg:14px;
+  --green:#4ade80;--green-soft:rgba(74,222,128,0.1);--green-border:rgba(74,222,128,0.2);
+  --red:#f87171;--red-soft:rgba(248,113,113,0.1);--red-border:rgba(248,113,113,0.2);
+  --amber:#fbbf24;--amber-soft:rgba(251,191,36,0.1);
+}
+html{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;font-size:16px;line-height:1.6}
+body{min-height:100vh;background:var(--bg)}
+
+/* LOGIN */
+#loginScreen{display:flex;align-items:center;justify-content:center;min-height:100vh;padding:1rem}
+.login-box{background:var(--surface);border:1px solid var(--border2);border-radius:var(--radius-lg);padding:2.5rem 2rem;width:100%;max-width:380px;text-align:center}
+.login-logo{font-family:'Bebas Neue',sans-serif;font-size:48px;letter-spacing:4px;color:var(--orange);line-height:1}
+.login-logo span{color:var(--text);font-size:13px;font-family:'DM Sans',sans-serif;font-weight:300;letter-spacing:4px;display:block;margin-top:2px;margin-bottom:2rem}
+.login-box p{font-size:13px;color:var(--muted);margin-bottom:1.5rem}
+.login-field{margin-bottom:12px;text-align:left}
+.login-field label{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.4px;font-weight:500;display:block;margin-bottom:5px}
+.login-field input{width:100%;background:var(--surface2);border:1px solid var(--border2);color:var(--text);font-family:'DM Sans',sans-serif;font-size:14px;padding:10px 14px;border-radius:var(--radius);outline:none;transition:border .2s}
+.login-field input:focus{border-color:var(--orange)}
+.login-err{font-size:13px;color:var(--orange);margin-bottom:10px;min-height:18px}
+.login-hint{font-size:12px;color:var(--muted2);margin-top:1.5rem;cursor:pointer}
+.login-hint:hover{color:var(--muted)}
+
+/* APP */
+#appScreen{display:none;flex-direction:column;min-height:100vh}
+header{display:flex;align-items:center;justify-content:space-between;padding:0 2rem;height:60px;border-bottom:1px solid var(--border);background:var(--surface);position:sticky;top:0;z-index:100}
+.logo{font-family:'Bebas Neue',sans-serif;font-size:26px;letter-spacing:2px;color:var(--orange);line-height:1}
+.logo span{color:var(--text);font-size:13px;font-family:'DM Sans',sans-serif;font-weight:300;letter-spacing:3px;display:block;margin-top:-2px}
+.header-right{display:flex;align-items:center;gap:12px}
+.user-badge{font-size:12px;color:var(--muted);background:var(--surface2);border:1px solid var(--border);padding:4px 12px;border-radius:20px}
+.user-badge span{color:var(--orange)}
+nav{display:flex;gap:4px}
+nav button{background:none;border:none;color:var(--muted);font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;padding:6px 14px;border-radius:6px;cursor:pointer;transition:all .2s}
+nav button:hover{color:var(--text);background:var(--surface2)}
+nav button.active{color:var(--orange);background:var(--orange-soft)}
+main{flex:1;padding:2rem;max-width:1200px;margin:0 auto;width:100%}
+
+/* PAGES */
+.page{display:none;animation:fadeIn .25s ease}
+.page.active{display:block}
+@keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+
+/* PAGE HEADER */
+.page-header{margin-bottom:2rem}
+.page-header h1{font-family:'Bebas Neue',sans-serif;font-size:42px;letter-spacing:2px;color:var(--text);line-height:1;margin-bottom:4px}
+.page-header h1 span{color:var(--orange)}
+.page-header p{font-size:14px;color:var(--muted);font-weight:300}
+
+/* FORMS */
+.form-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px;margin-bottom:12px}
+.field label{font-size:12px;color:var(--muted);display:block;margin-bottom:5px;letter-spacing:.3px;font-weight:500;text-transform:uppercase}
+.field input,.field select{width:100%;background:var(--surface2);border:1px solid var(--border2);color:var(--text);font-family:'DM Sans',sans-serif;font-size:14px;padding:9px 12px;border-radius:var(--radius);outline:none;transition:border .2s;appearance:none}
+.field input:focus,.field select:focus{border-color:var(--orange)}
+.field select option{background:var(--surface2)}
+.btn-primary{width:100%;background:var(--orange);color:#000;font-family:'DM Sans',sans-serif;font-size:14px;font-weight:600;border:none;padding:11px;border-radius:var(--radius);cursor:pointer;transition:all .2s;margin-top:4px}
+.btn-primary:hover{background:#fb923c}
+.btn-primary:disabled{opacity:.4;cursor:not-allowed}
+.btn-secondary{background:var(--surface2);color:var(--text);font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;border:1px solid var(--border2);padding:7px 14px;border-radius:var(--radius);cursor:pointer;transition:all .2s}
+.btn-secondary:hover{border-color:var(--orange);color:var(--orange)}
+.btn-danger{background:transparent;color:var(--red);font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;border:1px solid var(--red-border);padding:7px 14px;border-radius:var(--radius);cursor:pointer;transition:all .2s}
+.btn-danger:hover{background:var(--red-soft)}
+.btn-icon{background:var(--surface2);color:var(--muted);border:1px solid var(--border);padding:5px 9px;border-radius:6px;cursor:pointer;font-size:13px;transition:all .2s;font-family:'DM Sans',sans-serif}
+.btn-icon:hover{border-color:var(--orange);color:var(--orange)}
+.btn-icon.active-fav{color:var(--orange);border-color:var(--orange);background:var(--orange-soft)}
+
+/* MEAL CARDS */
+.meal-grid{display:grid;gap:12px}
+.meal-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:1.1rem 1.25rem;transition:border .2s}
+.meal-card:hover{border-color:var(--border2)}
+.meal-top{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:10px}
+.meal-type{font-size:11px;font-weight:600;letter-spacing:.8px;text-transform:uppercase;color:var(--orange);margin-bottom:2px}
+.meal-name{font-size:15px;font-weight:500;color:var(--text)}
+.meal-actions{display:flex;gap:6px;flex-shrink:0}
+.macro-row{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px}
+.m-tag{font-size:12px;background:var(--surface2);border:1px solid var(--border);color:var(--muted);padding:3px 8px;border-radius:6px}
+.m-tag.cal{color:var(--orange);border-color:var(--orange-dim)}
+.ingredients{font-size:13px;color:var(--muted);line-height:1.5;margin-bottom:8px}
+.ingredients strong{color:var(--text);font-weight:500}
+.prep-line{font-size:13px;color:var(--muted2);padding-top:8px;border-top:1px solid var(--border);line-height:1.5}
+
+/* TOTALS BAR */
+.totals-bar{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:8px;margin-bottom:1.5rem;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:1rem 1.25rem}
+.total-item p:first-child{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.4px;margin-bottom:2px;font-weight:500}
+.total-item p:last-child{font-size:17px;font-weight:500}
+.total-item.hi p:last-child{color:var(--orange)}
+
+/* WEEKLY */
+.week-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:8px;margin-bottom:1.5rem}
+.day-col{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);overflow:hidden}
+.day-head{background:var(--surface2);padding:8px 10px;font-size:11px;font-weight:600;letter-spacing:.5px;text-transform:uppercase;color:var(--muted);border-bottom:1px solid var(--border)}
+.day-head.today{background:var(--orange-soft);color:var(--orange);border-bottom-color:var(--orange-dim)}
+.day-meals{padding:8px}
+.day-meal-item{font-size:11px;color:var(--muted);padding:4px 6px;border-radius:5px;margin-bottom:3px;background:var(--surface2);border:1px solid var(--border);line-height:1.3}
+.day-meal-item strong{color:var(--text);display:block;font-size:11px;font-weight:500}
+.day-empty{font-size:11px;color:var(--muted2);padding:6px;text-align:center}
+.week-actions{display:flex;gap:8px;margin-bottom:1.5rem}
+
+/* FAVS */
+.favs-empty{text-align:center;padding:4rem 2rem;color:var(--muted);font-size:14px}
+.favs-empty span{font-size:36px;display:block;margin-bottom:12px}
+
+/* HOLLY */
+.recipe-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px}
+.recipe-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:1.1rem 1.25rem;cursor:pointer;transition:all .2s}
+.recipe-card:hover{border-color:var(--orange);background:var(--surface2)}
+.recipe-tag{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.6px;color:var(--orange);margin-bottom:4px}
+.recipe-card h3{font-size:14px;font-weight:500;margin-bottom:6px}
+.recipe-card p{font-size:12px;color:var(--muted);line-height:1.4;margin-bottom:10px}
+.recipe-macros{display:flex;gap:6px;flex-wrap:wrap}
+.recipe-macro{font-size:11px;background:var(--surface3);border:1px solid var(--border);color:var(--muted);padding:3px 7px;border-radius:5px}
+.add-recipe-btn{background:var(--surface2);border:1px dashed var(--border2);color:var(--muted);border-radius:var(--radius-lg);padding:1.1rem;text-align:center;cursor:pointer;transition:all .2s;font-size:13px;font-family:'DM Sans',sans-serif}
+.add-recipe-btn:hover{border-color:var(--orange);color:var(--orange)}
+
+/* ADMIN */
+.admin-tabs{display:flex;gap:4px;margin-bottom:1.5rem;border-bottom:1px solid var(--border);padding-bottom:0}
+.admin-tab{background:none;border:none;color:var(--muted);font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;padding:8px 16px;cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px;transition:all .2s}
+.admin-tab:hover{color:var(--text)}
+.admin-tab.active{color:var(--orange);border-bottom-color:var(--orange)}
+.admin-panel{display:none}
+.admin-panel.active{display:block}
+.admin-section{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:1.25rem;margin-bottom:1.5rem}
+.admin-section-title{font-size:11px;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);font-weight:600;margin-bottom:1rem}
+.client-table{width:100%;border-collapse:collapse}
+.client-table th{font-size:11px;text-transform:uppercase;letter-spacing:.4px;color:var(--muted);font-weight:500;padding:8px 12px;text-align:left;border-bottom:1px solid var(--border)}
+.client-table td{font-size:13px;padding:10px 12px;border-bottom:1px solid var(--border);vertical-align:middle}
+.client-table tr:last-child td{border-bottom:none}
+.status-badge{font-size:11px;padding:3px 8px;border-radius:20px;font-weight:500}
+.status-active{background:var(--green-soft);color:var(--green);border:1px solid var(--green-border)}
+.status-inactive{background:var(--surface2);color:var(--muted);border:1px solid var(--border)}
+.code-chip{font-family:monospace;font-size:13px;background:var(--surface3);border:1px solid var(--border2);color:var(--orange);padding:3px 10px;border-radius:6px;letter-spacing:1px}
+
+/* ANALYTICS */
+.stat-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:10px;margin-bottom:1.5rem}
+.stat-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:1rem 1.25rem}
+.stat-label{font-size:11px;text-transform:uppercase;letter-spacing:.4px;color:var(--muted);font-weight:500;margin-bottom:4px}
+.stat-val{font-size:26px;font-weight:600;font-family:'Bebas Neue',sans-serif;letter-spacing:1px;color:var(--text)}
+.stat-val.orange{color:var(--orange)}
+.stat-sub{font-size:11px;color:var(--muted2);margin-top:2px}
+.activity-table{width:100%;border-collapse:collapse}
+.activity-table th{font-size:11px;text-transform:uppercase;letter-spacing:.4px;color:var(--muted);font-weight:500;padding:8px 12px;text-align:left;border-bottom:1px solid var(--border)}
+.activity-table td{font-size:13px;padding:10px 12px;border-bottom:1px solid var(--border);vertical-align:middle}
+.activity-table tr:last-child td{border-bottom:none}
+.activity-table tr:hover td{background:var(--surface2)}
+.freq-bar-wrap{display:flex;align-items:center;gap:10px}
+.freq-bar{height:6px;border-radius:3px;background:var(--orange);min-width:4px;transition:width .4s}
+.freq-num{font-size:12px;color:var(--muted);min-width:24px}
+.last-seen-badge{font-size:11px;padding:3px 9px;border-radius:20px;font-weight:500;white-space:nowrap}
+.seen-today{background:var(--green-soft);color:var(--green);border:1px solid var(--green-border)}
+.seen-week{background:var(--amber-soft);color:var(--amber);border:1px solid rgba(251,191,36,.2)}
+.seen-old{background:var(--surface2);color:var(--muted);border:1px solid var(--border)}
+.seen-never{background:var(--red-soft);color:var(--red);border:1px solid var(--red-border)}
+.mini-heatmap{display:flex;gap:3px;align-items:center;flex-wrap:wrap}
+.heat-dot{width:10px;height:10px;border-radius:2px;background:var(--surface3);border:1px solid var(--border)}
+.heat-dot.h1{background:rgba(249,115,22,.25)}
+.heat-dot.h2{background:rgba(249,115,22,.5)}
+.heat-dot.h3{background:rgba(249,115,22,.8)}
+.heat-dot.h4{background:var(--orange)}
+.section-divider{border:none;border-top:1px solid var(--border);margin:1.5rem 0}
+
+/* LOADING */
+.loading{text-align:center;padding:3rem;color:var(--muted);font-size:14px}
+.spinner{width:28px;height:28px;border:2px solid var(--border2);border-top-color:var(--orange);border-radius:50%;animation:spin .7s linear infinite;margin:0 auto 12px}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* MODAL */
+.modal-backdrop{position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:200;display:flex;align-items:center;justify-content:center;padding:1rem}
+.modal{background:var(--surface);border:1px solid var(--border2);border-radius:var(--radius-lg);padding:1.5rem;width:100%;max-width:520px;max-height:85vh;overflow-y:auto}
+.modal h2{font-family:'Bebas Neue',sans-serif;font-size:24px;letter-spacing:1px;color:var(--orange);margin-bottom:1rem}
+.modal-close{float:right;background:none;border:none;color:var(--muted);font-size:20px;cursor:pointer;line-height:1;margin-top:-2px}
+.modal-close:hover{color:var(--text)}
+
+/* MISC */
+.pill{font-size:12px;padding:4px 10px;border-radius:20px;border:1px solid var(--border2);color:var(--muted);background:var(--surface2);font-weight:500}
+.pill.cal{border-color:var(--orange-dim);color:var(--orange)}
+.section-label{font-size:11px;font-weight:600;letter-spacing:.5px;text-transform:uppercase;color:var(--muted);margin-bottom:8px}
+#toast{position:fixed;bottom:24px;right:24px;background:var(--surface2);border:1px solid var(--orange-dim);color:var(--text);font-size:13px;padding:10px 18px;border-radius:var(--radius);opacity:0;transition:opacity .3s;z-index:300;pointer-events:none}
+#toast.show{opacity:1}
+@media(max-width:700px){
+  .week-grid{grid-template-columns:repeat(2,1fr)}
+  main{padding:1rem}
+  header{padding:0 1rem}
+  .stat-grid{grid-template-columns:repeat(2,1fr)}
+}
+</style>
+</head>
+<body>
+
+<!-- CLIENT LOGIN -->
+<div id="loginScreen">
+  <div class="login-box">
+    <div class="login-logo">NOVA<span>MEAL IDEAS</span></div>
+    <p>Enter your access code to continue.</p>
+    <div class="login-field">
+      <label>Email</label>
+      <input type="email" id="loginEmail" placeholder="your@email.com" onkeydown="if(event.key==='Enter')doLogin()"/>
+    </div>
+    <div class="login-field">
+      <label>Access code</label>
+      <input type="password" id="loginCode" placeholder="••••••••" onkeydown="if(event.key==='Enter')doLogin()"/>
+    </div>
+    <div class="login-err" id="loginErr"></div>
+    <button class="btn-primary" onclick="doLogin()">Sign in</button>
+    <div class="login-hint" onclick="showAdminLogin()" style="margin-top:1rem">Admin login →</div>
+  </div>
+  <img src="data:image/png;base64,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" alt="NF Logo" style="position:fixed;bottom:20px;right:20px;width:60px;height:60px;border-radius:10px;opacity:0.85;pointer-events:none;z-index:10"/>
+</div>
+
+<!-- ADMIN LOGIN -->
+<div id="adminLoginScreen" style="display:none;align-items:center;justify-content:center;min-height:100vh;padding:1rem">
+  <div class="login-box">
+    <div class="login-logo" style="color:var(--text)">NOVA<span style="color:var(--orange)">ADMIN</span></div>
+    <p>Admin access only.</p>
+    <div class="login-field">
+      <label>Admin email</label>
+      <input type="email" id="adminLoginEmail" placeholder="your@email.com" onkeydown="if(event.key==='Enter')doAdminLogin()"/>
+    </div>
+    <div class="login-field">
+      <label>Access code</label>
+      <input type="password" id="adminLoginCode" placeholder="••••••••" onkeydown="if(event.key==='Enter')doAdminLogin()"/>
+    </div>
+    <div class="login-err" id="adminLoginErr"></div>
+    <button class="btn-primary" onclick="doAdminLogin()">Sign in as admin</button>
+    <div class="login-hint" onclick="showClientLogin()" style="margin-top:1rem">← Back to client login</div>
+  </div>
+</div>
+
+<!-- APP -->
+<div id="appScreen" style="display:none;flex-direction:column;min-height:100vh">
+  <header>
+    <div class="logo">NOVA<span>MEAL IDEAS</span></div>
+    <nav id="mainNav">
+      <button class="active" onclick="showPage('generate')" id="nav-generate">Generate</button>
+      <button onclick="showPage('weekly')" id="nav-weekly">Weekly Plan</button>
+      <button onclick="showPage('favourites')" id="nav-favourites">Favourites</button>
+      <button onclick="showPage('holly')" id="nav-holly">Holly's Recipes</button>
+    </nav>
+    <div class="header-right">
+      <div class="user-badge" id="userBadge"></div>
+      <button class="btn-secondary" onclick="doLogout()" style="padding:5px 12px;font-size:12px">Sign out</button>
+    </div>
+  </header>
+  <main>
+
+    <!-- GENERATE -->
+    <div class="page active" id="page-generate">
+      <div class="page-header">
+        <h1>GET YOUR <span>MEALS</span></h1>
+        <p>Enter your targets, tell us what's in your fridge, and we'll build your day around it.</p>
+      </div>
+
+      <!-- MACROS ROW -->
+      <div class="form-grid" style="margin-bottom:12px">
+        <div class="field"><label>Calories</label><input type="number" id="g-cal" placeholder="e.g. 2000"/></div>
+        <div class="field"><label>Protein (g)</label><input type="number" id="g-prot" placeholder="e.g. 150"/></div>
+        <div class="field"><label>Carbs (g)</label><input type="number" id="g-carbs" placeholder="e.g. 200"/></div>
+        <div class="field"><label>Fat (g)</label><input type="number" id="g-fat" placeholder="e.g. 65"/></div>
+        <div class="field"><label>Meals / day</label>
+          <select id="g-meals"><option value="3">3 meals</option><option value="4">4 meals</option><option value="5">5 meals</option><option value="6">6 meals</option></select>
+        </div>
+        <div class="field"><label>Max prep</label>
+          <select id="g-prep"><option value="under 10 mins">Under 10 mins</option><option value="under 20 mins">Under 20 mins</option><option value="under 30 mins">Under 30 mins</option></select>
+        </div>
+        <div class="field"><label>Diet</label>
+          <select id="g-diet"><option value="no restrictions">No restrictions</option><option value="vegetarian">Vegetarian</option><option value="vegan">Vegan</option><option value="gluten-free">Gluten-free</option><option value="dairy-free">Dairy-free</option></select>
+        </div>
+        </div>
+
+      <!-- SHOPPING LIST -->
+      <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:1.25rem;margin-bottom:12px">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+          <div>
+            <div style="font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.4px;color:var(--orange);margin-bottom:3px">What's your shopping list?</div>
+            <div style="font-size:12px;color:var(--muted)">Type your ingredients — we'll build meals around what you have.</div>
+          </div>
+        </div>
+        <div id="ingredientTags" style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px"></div>
+        <div style="display:flex;gap:8px">
+          <input type="text" id="ingredientInput" placeholder="e.g. chicken breast, basmati rice, broccoli..."
+            style="flex:1;background:var(--surface2);border:1px solid var(--border2);color:var(--text);font-family:'DM Sans',sans-serif;font-size:14px;padding:9px 12px;border-radius:var(--radius);outline:none"
+            onkeydown="if(event.key==='Enter'||event.key===','){addIngredient();event.preventDefault()}"/>
+          <button class="btn-secondary" onclick="addIngredient()" style="flex-shrink:0">+ Add</button>
+        </div>
+        <div style="margin-top:10px">
+          <div style="font-size:11px;color:var(--muted2);margin-bottom:6px;text-transform:uppercase;letter-spacing:.3px;font-weight:500">Quick add</div>
+          <div style="display:flex;flex-wrap:wrap;gap:5px" id="quickAddBtns"></div>
+        </div>
+      </div>
+
+      <!-- SEASONING & SAUCES PANEL -->
+      <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:1.25rem;margin-bottom:12px">
+        <div style="display:flex;gap:4px;margin-bottom:1rem;border-bottom:1px solid var(--border);padding-bottom:0">
+          <button class="admin-tab active" onclick="switchSeasonTab('spices')" id="stab-spices" style="font-size:12px;padding:6px 12px">Spices & Herbs</button>
+          <button class="admin-tab" onclick="switchSeasonTab('callowfit')" id="stab-callowfit" style="font-size:12px;padding:6px 12px">Callowfit</button>
+          <button class="admin-tab" onclick="switchSeasonTab('skinny')" id="stab-skinny" style="font-size:12px;padding:6px 12px">Skinny Food Co</button>
+          <button class="admin-tab" onclick="switchSeasonTab('other')" id="stab-other" style="font-size:12px;padding:6px 12px">Other Sauces</button>
+        </div>
+        <input type="text" id="seasonSearch" placeholder="Search seasonings and sauces..."
+          oninput="filterSeasonings(this.value)"
+          style="width:100%;box-sizing:border-box;background:var(--surface2);border:1px solid var(--border2);color:var(--text);font-family:'DM Sans',sans-serif;font-size:13px;padding:8px 12px;border-radius:var(--radius);outline:none;margin-bottom:10px"/>
+        <div id="seasoningPanel"></div>
+      </div>
+
+      <button class="btn-primary" id="genBtn" onclick="generateMeals()">Generate my meals</button>
+      <div id="gen-output" style="margin-top:1.5rem"></div>
+    </div>
+
+    <!-- WEEKLY -->
+    <div class="page" id="page-weekly">
+      <div class="page-header">
+        <h1>WEEKLY <span>PLAN</span></h1>
+        <p>Build your current week, save it with a name, and keep a full history of past weeks.</p>
+      </div>
+
+      <!-- WEEK LIBRARY -->
+      <div id="weekLibrarySection" style="margin-bottom:1.5rem">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+          <div style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.4px;color:var(--muted)">Saved weeks</div>
+          <button class="btn-secondary" style="font-size:12px;padding:5px 12px" onclick="openSaveWeekModal()">+ Save current week</button>
+        </div>
+        <div id="weekLibraryList"></div>
+      </div>
+
+      <!-- CURRENT WEEK -->
+      <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:1.25rem;margin-bottom:1rem">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;flex-wrap:wrap;gap:8px">
+          <div style="font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.4px;color:var(--orange)" id="currentWeekLabel">Current week</div>
+          <div style="display:flex;gap:6px;flex-wrap:wrap">
+            <button class="btn-secondary" style="font-size:12px;padding:5px 12px" onclick="showPage('generate')">+ Generate meals</button>
+            <button class="btn-secondary" style="font-size:12px;padding:5px 12px" onclick="clearWeek()">Clear week</button>
+          </div>
+        </div>
+        <div class="week-grid" id="weekGrid"></div>
+      </div>
+
+      <div id="weekDetail"></div>
+    </div>
+
+    <!-- FAVOURITES -->
+    <div class="page" id="page-favourites">
+      <div class="page-header">
+        <h1>SAVED <span>FAVOURITES</span></h1>
+        <p>Meals you've starred from generated plans.</p>
+      </div>
+      <div id="favsOutput"></div>
+    </div>
+
+    <!-- HOLLY -->
+    <div class="page" id="page-holly">
+      <div class="page-header">
+        <h1>HOLLY'S <span>RECIPES</span></h1>
+        <p>Holly's personal recipe collection. Click any recipe to view full details, or add your own.</p>
+      </div>
+      <div id="hollyOutput"></div>
+    </div>
+    <!-- ADMIN -->
+    <div class="page" id="page-admin">
+      <div class="page-header">
+        <h1>ADMIN <span>PANEL</span></h1>
+        <p>Manage clients and track usage.</p>
+      </div>
+      <div class="admin-tabs">
+        <button class="admin-tab active" onclick="switchAdminTab('usage')" id="atab-usage">Usage Analytics</button>
+        <button class="admin-tab" onclick="switchAdminTab('clients')" id="atab-clients">Client Management</button>
+      </div>
+
+      <!-- USAGE ANALYTICS PANEL -->
+      <div class="admin-panel active" id="apanel-usage">
+        <div class="stat-grid" id="analyticsStats"></div>
+        <div class="admin-section">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem">
+            <div class="admin-section-title" style="margin:0">Client activity</div>
+            <div style="display:flex;gap:6px">
+              <button class="btn-icon" onclick="sortActivity('name')" id="sort-name">Name ↕</button>
+              <button class="btn-icon" onclick="sortActivity('logins')" id="sort-logins">Logins ↕</button>
+              <button class="btn-icon" onclick="sortActivity('last')" id="sort-last">Last seen ↕</button>
+            </div>
+          </div>
+          <div id="activityTable"></div>
+        </div>
+        <div class="admin-section">
+          <div class="admin-section-title">30-day login activity</div>
+          <div id="heatmapWrap"></div>
+        </div>
+      </div>
+
+      <!-- CLIENT MANAGEMENT PANEL -->
+      <div class="admin-panel" id="apanel-clients">
+        <div class="admin-section">
+          <div class="admin-section-title">Admin accounts</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr auto;gap:10px;align-items:end;margin-bottom:1rem">
+            <div class="field" style="margin:0"><label>Admin name</label><input type="text" id="new-admin-name" placeholder="e.g. Holly"/></div>
+            <div class="field" style="margin:0"><label>Admin email</label><input type="email" id="new-admin-email" placeholder="holly@nova.com"/></div>
+            <button class="btn-primary" style="margin:0;width:auto;padding:9px 20px" onclick="addAdmin()">Add admin</button>
+          </div>
+          <div id="adminTable"></div>
+        </div>
+        <div class="admin-section" style="margin-top:1rem">
+          <div class="admin-section-title">Add new client</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr auto;gap:10px;align-items:end">
+            <div class="field" style="margin:0"><label>Client name</label><input type="text" id="new-name" placeholder="e.g. Sarah Jones"/></div>
+            <div class="field" style="margin:0"><label>Email</label><input type="email" id="new-email" placeholder="sarah@email.com"/></div>
+            <button class="btn-primary" style="margin:0;width:auto;padding:9px 20px" onclick="addClient()">Add client</button>
+          </div>
+        </div>
+        <div class="admin-section">
+          <div class="admin-section-title">Client list</div>
+          <div id="clientTable"></div>
+        </div>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<!-- MODAL -->
+<div id="modal" class="modal-backdrop" style="display:none" onclick="closeModal(event)">
+  <div class="modal"><button class="modal-close" onclick="document.getElementById('modal').style.display='none'">✕</button><div id="modalContent"></div></div>
+</div>
+<div id="toast"></div>
+
+<script>
+const ADMIN_PASSWORD='novameals';
+const DAYS=['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+let activitySortField='logins';
+let activitySortDir=-1;
+
+// ── CLIENTS ──
+function getClients(){try{return JSON.parse(localStorage.getItem('nova_clients')||'[]');}catch(e){return[];}}
+function saveClients(a){localStorage.setItem('nova_clients',JSON.stringify(a));}
+function generateCode(){const c='ABCDEFGHJKLMNPQRSTUVWXYZ23456789';let s='';for(let i=0;i<6;i++)s+=c[Math.floor(Math.random()*c.length)];return s;}
+
+// Initialise defaults if nothing stored yet
+(function(){
+  var existing = [];
+  try{ existing = JSON.parse(localStorage.getItem('nova_admins')||'[]'); }catch(e){}
+
+  // Always make sure Steven exists
+  var hasStevenEmail = existing.some(function(a){ return a.email==='novafitnesswellbeing@gmail.com'; });
+  if(!hasStevenEmail){
+    existing.push({id:1,name:'Steven',email:'novafitnesswellbeing@gmail.com',code:'SCADMIN',active:true});
+  }
+
+  // Always make sure Holly exists
+  var hasHolly = existing.some(function(a){ return a.email==='holly.novafitnessandwellbeing@gmail.com'; });
+  if(!hasHolly){
+    existing.push({id:2,name:'Holly',email:'holly.novafitnessandwellbeing@gmail.com',code:'HFADMIN',active:true});
+  }
+
+  localStorage.setItem('nova_admins', JSON.stringify(existing));
+
+  // Demo client only if no clients exist yet
+  if(!getClients().length){
+    saveClients([{id:1,name:'Demo Client',email:'demo@novameals.com',code:'DEMO01',active:true}]);
+  }
+})();
+
+// ── USAGE TRACKING ──
+function getUsage(){try{return JSON.parse(localStorage.getItem('nova_usage')||'{}');}catch(e){return{};}}
+function saveUsage(u){localStorage.setItem('nova_usage',JSON.stringify(u));}
+
+function recordLogin(email,name){
+  const u=getUsage();
+  const now=new Date().toISOString();
+  const today=now.slice(0,10);
+  if(!u[email])u[email]={name,email,totalLogins:0,loginDates:[],lastSeen:null,generations:0};
+  u[email].name=name;
+  u[email].totalLogins=(u[email].totalLogins||0)+1;
+  u[email].lastSeen=now;
+  if(!u[email].loginDates)u[email].loginDates=[];
+  // store last 90 days only, dedupe same day
+  if(!u[email].loginDates.includes(today)){
+    u[email].loginDates.push(today);
+    if(u[email].loginDates.length>90)u[email].loginDates.shift();
+  }
+  saveUsage(u);
+}
+
+function recordGeneration(email){
+  const u=getUsage();
+  if(u[email]){u[email].generations=(u[email].generations||0)+1;saveUsage(u);}
+}
+
+function getLastSeenLabel(isoStr){
+  if(!isoStr)return{label:'Never',cls:'seen-never'};
+  const diff=Math.floor((Date.now()-new Date(isoStr))/86400000);
+  if(diff===0)return{label:'Today',cls:'seen-today'};
+  if(diff===1)return{label:'Yesterday',cls:'seen-week'};
+  if(diff<=7)return{label:`${diff}d ago`,cls:'seen-week'};
+  if(diff<=30)return{label:`${diff}d ago`,cls:'seen-old'};
+  return{label:`${diff}d ago`,cls:'seen-never'};
+}
+
+// ── ADMIN STORE ──
+function getAdmins(){
+  try{
+    var stored = JSON.parse(localStorage.getItem('nova_admins')||'[]');
+    if(stored.length) return stored;
+  }catch(e){}
+  // Fallback if localStorage is empty
+  return [{id:1,name:'Steven',email:'novafitnesswellbeing@gmail.com',code:'SCADMIN',active:true}];
+}
+function saveAdmins(a){localStorage.setItem('nova_admins',JSON.stringify(a));}
+
+function showAdminLogin(){
+  document.getElementById('loginScreen').style.display='none';
+  document.getElementById('adminLoginScreen').style.display='flex';
+  document.getElementById('adminLoginErr').textContent='';
+  document.getElementById('adminLoginEmail').value='';
+  document.getElementById('adminLoginCode').value='';
+}
+
+function showClientLogin(){
+  document.getElementById('adminLoginScreen').style.display='none';
+  document.getElementById('loginScreen').style.display='flex';
+  document.getElementById('loginErr').textContent='';
+}
+
+// ── LOGIN ──
+function doLogin(){
+  const email=document.getElementById('loginEmail').value.trim().toLowerCase();
+  const code=document.getElementById('loginCode').value.trim().toUpperCase();
+  const match=getClients().find(function(c){return c.email.toLowerCase()===email&&c.code===code&&c.active;});
+  if(match){
+    recordLogin(email,match.name);
+    sessionStorage.setItem('nova_session',JSON.stringify({type:'client',name:match.name,email:match.email}));
+    enterApp({type:'client',name:match.name,email:match.email});
+  }else{
+    document.getElementById('loginErr').textContent='Invalid email or access code.';
+  }
+}
+
+function doAdminLogin(){
+  const email=document.getElementById('adminLoginEmail').value.trim().toLowerCase();
+  const code=document.getElementById('adminLoginCode').value.trim().toUpperCase();
+  const adminMatch=getAdmins().find(function(a){return a.email.toLowerCase()===email&&a.code===code&&a.active;});
+  if(adminMatch){
+    sessionStorage.setItem('nova_session',JSON.stringify({type:'admin',name:adminMatch.name,email:adminMatch.email}));
+    document.getElementById('adminLoginScreen').style.display='none';
+    enterApp({type:'admin',name:adminMatch.name,email:adminMatch.email});
+  }else{
+    document.getElementById('adminLoginErr').textContent='Invalid email or access code.';
+  }
+}
+
+function enterApp(session){
+  document.getElementById('loginScreen').style.display='none';
+  document.getElementById('appScreen').style.display='flex';
+  document.getElementById('userBadge').innerHTML=`<span>${session.name}</span>`;
+
+  // Remove any existing admin nav button first
+  const existingAdminBtn = document.getElementById('nav-admin');
+  if(existingAdminBtn) existingAdminBtn.remove();
+
+  if(session.type==='admin'){
+    const nav=document.getElementById('mainNav');
+    const btn=document.createElement('button');
+    btn.id='nav-admin';btn.textContent='Admin';
+    btn.onclick=()=>showPage('admin');
+    nav.appendChild(btn);
+  }
+  loadAppState();
+  renderWeekly();
+  initGeneratePage();
+}
+
+function doLogout(){
+  sessionStorage.removeItem('nova_session');
+  document.getElementById('appScreen').style.display='none';
+  document.getElementById('adminLoginScreen').style.display='none';
+  document.getElementById('loginScreen').style.display='flex';
+  document.getElementById('loginErr').textContent='';
+  document.getElementById('loginEmail').value='';
+  document.getElementById('loginCode').value='';
+}
+
+(function(){
+  try{
+    const s=JSON.parse(sessionStorage.getItem('nova_session'));
+    if(s){
+      document.getElementById('adminLoginScreen').style.display='none';
+      enterApp(s);
+    }
+  }catch(e){}
+})();
+
+// ── ADMIN TABS ──
+function switchAdminTab(tab){
+  document.querySelectorAll('.admin-tab').forEach(b=>b.classList.remove('active'));
+  document.querySelectorAll('.admin-panel').forEach(p=>p.classList.remove('active'));
+  document.getElementById('atab-'+tab).classList.add('active');
+  document.getElementById('apanel-'+tab).classList.add('active');
+  if(tab==='usage')renderAnalytics();
+  if(tab==='clients'){renderClientTable();renderAdminTable();}
+}
+
+// ── ANALYTICS ──
+function sortActivity(field){
+  if(activitySortField===field)activitySortDir*=-1;
+  else{activitySortField=field;activitySortDir=-1;}
+  renderAnalytics();
+}
+
+function renderAnalytics(){
+  const usage=getUsage();
+  const clients=getClients();
+  const rows=Object.values(usage);
+
+  // merge any clients not yet in usage
+  clients.forEach(c=>{
+    if(!usage[c.email])rows.push({name:c.name,email:c.email,totalLogins:0,loginDates:[],lastSeen:null,generations:0});
+  });
+
+  const totalLogins=rows.reduce((s,r)=>s+(r.totalLogins||0),0);
+  const activeToday=rows.filter(r=>r.lastSeen&&new Date(r.lastSeen).toDateString()===new Date().toDateString()).length;
+  const activeWeek=rows.filter(r=>{if(!r.lastSeen)return false;return(Date.now()-new Date(r.lastSeen))/86400000<=7;}).length;
+  const totalGens=rows.reduce((s,r)=>s+(r.generations||0),0);
+  const neverLogged=rows.filter(r=>!r.totalLogins).length;
+
+  document.getElementById('analyticsStats').innerHTML=`
+    <div class="stat-card"><div class="stat-label">Total logins</div><div class="stat-val orange">${totalLogins}</div><div class="stat-sub">all time</div></div>
+    <div class="stat-card"><div class="stat-label">Active today</div><div class="stat-val">${activeToday}</div><div class="stat-sub">clients</div></div>
+    <div class="stat-card"><div class="stat-label">Active this week</div><div class="stat-val">${activeWeek}</div><div class="stat-sub">last 7 days</div></div>
+    <div class="stat-card"><div class="stat-label">Meal plans generated</div><div class="stat-val orange">${totalGens}</div><div class="stat-sub">all time</div></div>
+    <div class="stat-card"><div class="stat-label">Never logged in</div><div class="stat-val" style="color:var(--red)">${neverLogged}</div><div class="stat-sub">of ${rows.length} clients</div></div>
+    <div class="stat-card"><div class="stat-label">Total clients</div><div class="stat-val">${clients.length}</div><div class="stat-sub">registered</div></div>`;
+
+  // sort
+  const maxLogins=Math.max(1,...rows.map(r=>r.totalLogins||0));
+  rows.sort((a,b)=>{
+    if(activitySortField==='name')return activitySortDir*(a.name||'').localeCompare(b.name||'');
+    if(activitySortField==='logins')return activitySortDir*((a.totalLogins||0)-(b.totalLogins||0));
+    if(activitySortField==='last'){
+      const ta=a.lastSeen?new Date(a.lastSeen).getTime():0;
+      const tb=b.lastSeen?new Date(b.lastSeen).getTime():0;
+      return activitySortDir*(ta-tb);
+    }
+    return 0;
+  });
+
+  let html=`<div style="overflow-x:auto"><table class="activity-table">
+    <thead><tr>
+      <th>Client</th><th>Email</th><th>Total logins</th><th>Frequency</th>
+      <th>Meal plans</th><th>Last seen</th><th>Detail</th>
+    </tr></thead><tbody>`;
+
+  rows.forEach(r=>{
+    const ls=getLastSeenLabel(r.lastSeen);
+    const barW=Math.round(((r.totalLogins||0)/maxLogins)*120);
+    const isClient=clients.find(c=>c.email===r.email);
+    html+=`<tr>
+      <td style="font-weight:500">${r.name||'—'}</td>
+      <td style="color:var(--muted);font-size:12px">${r.email}</td>
+      <td style="font-weight:500;color:var(--orange)">${r.totalLogins||0}</td>
+      <td><div class="freq-bar-wrap"><div class="freq-bar" style="width:${barW}px"></div><span class="freq-num">${r.totalLogins||0}</span></div></td>
+      <td style="color:var(--muted)">${r.generations||0}</td>
+      <td><span class="last-seen-badge ${ls.cls}">${ls.label}</span></td>
+      <td><button class="btn-icon" onclick="showClientDetail('${r.email}')">View →</button></td>
+    </tr>`;
+  });
+
+  html+=`</tbody></table></div>`;
+  document.getElementById('activityTable').innerHTML=html;
+
+  // 30-day heatmap
+  renderHeatmap(rows);
+}
+
+function renderHeatmap(rows){
+  const today=new Date();
+  const days=[];
+  for(let i=29;i>=0;i--){
+    const d=new Date(today);d.setDate(d.getDate()-i);
+    days.push(d.toISOString().slice(0,10));
+  }
+
+  // count logins per day
+  const counts={};
+  days.forEach(d=>counts[d]=0);
+  rows.forEach(r=>{
+    (r.loginDates||[]).forEach(d=>{if(counts[d]!==undefined)counts[d]++;});
+  });
+  const max=Math.max(1,...Object.values(counts));
+
+  let html=`<div style="display:flex;gap:2px;flex-wrap:wrap;align-items:flex-end">`;
+  days.forEach(d=>{
+    const n=counts[d];
+    const ratio=n/max;
+    let cls='heat-dot';
+    if(n===0)cls='heat-dot';
+    else if(ratio<0.25)cls='heat-dot h1';
+    else if(ratio<0.5)cls='heat-dot h2';
+    else if(ratio<0.75)cls='heat-dot h3';
+    else cls='heat-dot h4';
+    const label=d.slice(5)+': '+n+' login'+(n!==1?'s':'');
+    html+=`<div class="${cls}" title="${label}" style="cursor:default"></div>`;
+  });
+  html+=`</div>
+  <div style="display:flex;gap:4px;align-items:center;margin-top:8px;font-size:11px;color:var(--muted2)">
+    <span>Less</span>
+    <div class="heat-dot"></div><div class="heat-dot h1"></div><div class="heat-dot h2"></div><div class="heat-dot h3"></div><div class="heat-dot h4"></div>
+    <span>More</span>
+    <span style="margin-left:8px">— hover dots for exact counts</span>
+  </div>`;
+  document.getElementById('heatmapWrap').innerHTML=html;
+}
+
+function showClientDetail(email){
+  const usage=getUsage();
+  const r=usage[email];
+  const client=getClients().find(c=>c.email===email);
+  if(!r&&!client){toast('No data');return;}
+  const name=(r&&r.name)||(client&&client.name)||email;
+  const logins=(r&&r.totalLogins)||0;
+  const gens=(r&&r.generations)||0;
+  const lastSeen=r&&r.lastSeen;
+  const ls=getLastSeenLabel(lastSeen);
+  const dates=(r&&r.loginDates)||[];
+  const lastDate=lastSeen?new Date(lastSeen).toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'}):'Never';
+
+  // last 10 unique login days
+  const recent=[...dates].reverse().slice(0,10);
+
+  let html=`<h2>${name}</h2>
+    <div style="font-size:12px;color:var(--muted);margin-bottom:1.5rem">${email}</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:1.5rem">
+      <div class="stat-card"><div class="stat-label">Total logins</div><div class="stat-val orange" style="font-size:22px">${logins}</div></div>
+      <div class="stat-card"><div class="stat-label">Meal plans</div><div class="stat-val" style="font-size:22px">${gens}</div></div>
+      <div class="stat-card"><div class="stat-label">Status</div><div style="margin-top:6px"><span class="last-seen-badge ${ls.cls}">${ls.label}</span></div></div>
+    </div>
+    <div class="section-label" style="margin-bottom:6px">Last seen</div>
+    <p style="font-size:13px;color:var(--muted);margin-bottom:1rem">${lastDate}</p>`;
+
+  if(recent.length){
+    html+=`<div class="section-label" style="margin-bottom:6px">Recent login days</div>
+    <div style="display:flex;flex-direction:column;gap:4px;margin-bottom:1rem">
+      ${recent.map(d=>`<div style="font-size:13px;color:var(--muted);padding:5px 10px;background:var(--surface2);border-radius:6px;border:1px solid var(--border)">${new Date(d).toLocaleDateString('en-GB',{weekday:'short',day:'numeric',month:'short'})}</div>`).join('')}
+    </div>`;
+  }else{
+    html+=`<p style="font-size:13px;color:var(--muted2);margin-bottom:1rem">No login history recorded yet.</p>`;
+  }
+
+  if(client){
+    html+=`<hr class="section-divider"/>
+    <div style="display:flex;gap:8px">
+      <button class="btn-icon" onclick="resetClientCode(${client.id});document.getElementById('modal').style.display='none'">↻ Reset code</button>
+      <button class="btn-icon" onclick="toggleClientStatus(${client.id});document.getElementById('modal').style.display='none'">${client.active?'Deactivate':'Activate'}</button>
+    </div>`;
+  }
+
+  showModal(html);
+}
+
+// ── CLIENT MANAGEMENT ──
+function addClient(){
+  const name=document.getElementById('new-name').value.trim();
+  const email=document.getElementById('new-email').value.trim().toLowerCase();
+  if(!name||!email){toast('Please fill in name and email');return;}
+  const clients=getClients();
+  if(clients.find(c=>c.email.toLowerCase()===email)){toast('Email already exists');return;}
+  const code=generateCode();
+  clients.push({id:Date.now(),name,email,code,active:true});
+  saveClients(clients);
+  document.getElementById('new-name').value='';
+  document.getElementById('new-email').value='';
+  renderClientTable();
+  toast(`Client added — code: ${code}`);
+}
+
+function toggleClientStatus(id){
+  const clients=getClients();
+  const c=clients.find(x=>x.id===id);
+  if(c)c.active=!c.active;
+  saveClients(clients);
+  renderClientTable();
+  toast(c.active?'Client activated':'Client deactivated');
+}
+
+function resetClientCode(id){
+  const clients=getClients();
+  const c=clients.find(x=>x.id===id);
+  if(c){c.code=generateCode();saveClients(clients);renderClientTable();toast(`New code: ${c.code}`);}
+}
+
+function removeClient(id){
+  if(!confirm('Remove this client?'))return;
+  saveClients(getClients().filter(c=>c.id!==id));
+  renderClientTable();
+  toast('Client removed');
+}
+
+function renderClientTable(){
+  const clients=getClients();
+  const usage=getUsage();
+  if(!clients.length){document.getElementById('clientTable').innerHTML='<p style="font-size:13px;color:var(--muted)">No clients yet.</p>';return;}
+  let html=`<table class="client-table"><thead><tr><th>Name</th><th>Email</th><th>Access code</th><th>Logins</th><th>Last seen</th><th>Status</th><th>Actions</th></tr></thead><tbody>`;
+  clients.forEach(c=>{
+    const u=usage[c.email.toLowerCase()]||{};
+    const ls=getLastSeenLabel(u.lastSeen||null);
+    html+=`<tr>
+      <td style="font-weight:500">${c.name}</td>
+      <td style="color:var(--muted);font-size:12px">${c.email}</td>
+      <td><span class="code-chip">${c.code}</span></td>
+      <td style="color:var(--orange);font-weight:500">${u.totalLogins||0}</td>
+      <td><span class="last-seen-badge ${ls.cls}">${ls.label}</span></td>
+      <td><span class="status-badge ${c.active?'status-active':'status-inactive'}">${c.active?'Active':'Inactive'}</span></td>
+      <td><div style="display:flex;gap:6px">
+        <button class="btn-icon" onclick="resetClientCode(${c.id})">↻ Code</button>
+        <button class="btn-icon" onclick="toggleClientStatus(${c.id})">${c.active?'Off':'On'}</button>
+        <button class="btn-danger" style="padding:5px 9px;font-size:12px" onclick="removeClient(${c.id})">Remove</button>
+      </div></td>
+    </tr>`;
+  });
+  html+=`</tbody></table>`;
+  document.getElementById('clientTable').innerHTML=html;
+}
+
+// ── ADMIN MANAGEMENT ──
+function addAdmin(){
+  const name=document.getElementById('new-admin-name').value.trim();
+  const email=document.getElementById('new-admin-email').value.trim().toLowerCase();
+  if(!name||!email){toast('Please fill in name and email');return;}
+  const admins=getAdmins();
+  if(admins.find(a=>a.email.toLowerCase()===email)){toast('Email already exists');return;}
+  const code=generateCode();
+  admins.push({id:Date.now(),name,email,code,active:true});
+  saveAdmins(admins);
+  document.getElementById('new-admin-name').value='';
+  document.getElementById('new-admin-email').value='';
+  renderAdminTable();
+  toast(`Admin added — code: ${code}`);
+}
+
+function resetAdminCode(id){
+  const admins=getAdmins();
+  const a=admins.find(x=>x.id===id);
+  if(a){a.code=generateCode();saveAdmins(admins);renderAdminTable();toast(`New code: ${a.code}`);}
+}
+
+function removeAdmin(id){
+  const admins=getAdmins();
+  if(admins.length<=1){toast('Cannot remove the last admin account');return;}
+  if(!confirm('Remove this admin?'))return;
+  saveAdmins(admins.filter(a=>a.id!==id));
+  renderAdminTable();
+  toast('Admin removed');
+}
+
+function renderAdminTable(){
+  const admins=getAdmins();
+  if(!admins.length){document.getElementById('adminTable').innerHTML='<p style="font-size:13px;color:var(--muted)">No admins.</p>';return;}
+  let html=`<table class="client-table"><thead><tr><th>Name</th><th>Email</th><th>Access code</th><th>Actions</th></tr></thead><tbody>`;
+  admins.forEach(a=>{
+    html+=`<tr>
+      <td style="font-weight:500">${a.name}</td>
+      <td style="color:var(--muted);font-size:12px">${a.email}</td>
+      <td><span class="code-chip">${a.code}</span></td>
+      <td><div style="display:flex;gap:6px">
+        <button class="btn-icon" onclick="resetAdminCode(${a.id})">↻ New code</button>
+        <button class="btn-danger" style="padding:5px 9px;font-size:12px" onclick="removeAdmin(${a.id})">Remove</button>
+      </div></td>
+    </tr>`;
+  });
+  html+=`</tbody></table>`;
+  document.getElementById('adminTable').innerHTML=html;
+}
+
+
+let state={lastGenerated:null,lastMacroTargets:null,weekPlan:{},favourites:[],hollyRecipes:getDefaultHollyRecipes()};
+function stateKey(){try{const s=JSON.parse(sessionStorage.getItem('nova_session'));return'nova_state_'+(s?s.email||s.name:'default');}catch(e){return'nova_state_default';}}
+function loadAppState(){
+  try{
+    const s=localStorage.getItem(stateKey());
+    if(s){const p=JSON.parse(s);state={...state,...p};if(!state.hollyRecipes||!state.hollyRecipes.length)state.hollyRecipes=getDefaultHollyRecipes();}
+  }catch(e){}
+}
+function saveState(){try{localStorage.setItem(stateKey(),JSON.stringify(state));}catch(e){}}
+
+// ── NAV ──
+function showPage(id){
+  // Block non-admins from accessing admin page
+  if(id==='admin'){
+    try{
+      const s=JSON.parse(sessionStorage.getItem('nova_session'));
+      if(!s||s.type!=='admin') return;
+    }catch(e){ return; }
+  }
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('nav button').forEach(b=>b.classList.remove('active'));
+  document.getElementById('page-'+id).classList.add('active');
+  const nb=document.getElementById('nav-'+id);if(nb)nb.classList.add('active');
+  if(id==='weekly')renderWeekly();
+  if(id==='favourites')renderFavourites();
+  if(id==='holly')renderHolly();
+  if(id==='generate')initGeneratePage();
+  if(id==='admin'){renderAnalytics();renderClientTable();renderAdminTable();}
+}
+
+// ── INGREDIENT TAGS ──
+let selectedIngredients = [];
+
+const QUICK_ADD_ITEMS = ['Chicken breast','Turkey mince','Salmon','Lean beef mince','Eggs','Basmati rice','Sweet potato','Pasta','Oats','Greek yoghurt','Broccoli','Spinach'];
+
+const SEASON_DATA = {
+  spices: {
+    label:'Spices & Herbs',
+    items:['Smoked paprika','Garlic powder','Onion granules','Cumin','Turmeric','Chilli flakes','Cayenne pepper','Mixed herbs','Italian seasoning','Cajun spice','Fajita seasoning','Chinese 5 spice','Garam masala','Coriander','Cinnamon','Oregano','Thyme','Rosemary','Paprika','Black pepper','Curry powder','Ras el hanout']
+  },
+  callowfit: {
+    label:'Callowfit (0–7 kcal/serving)',
+    items:['Callowfit Smoky BBQ','Callowfit Sweet Chilli','Callowfit Honey Mustard','Callowfit Garlic (Aioli style)','Callowfit Ketchup','Callowfit Peri-Peri','Callowfit Spicy Mayo','Callowfit Teriyaki','Callowfit Salty Caramel','Callowfit Chocolate Sauce','Callowfit Curry Ketchup','Callowfit Toscana (Tomato Herb)','Callowfit Ranch','Callowfit Caesar']
+  },
+  skinny: {
+    label:'Skinny Food Co (virtually zero cal)',
+    items:['Skinny Sauce Sweet Chilli','Skinny Sauce Honey BBQ','Skinny Sauce Garlic & Herb','Skinny Sauce Ketchup','Skinny Sauce Brown Sauce','Skinny Sauce Tartare','Skinny Sauce Burger','Skinny Sauce Thousand Island','Skinny Fakeaway Peri-Peri','Skinny Fakeaway Chinese','Skinny Fakeaway Curry','Skinny Fakeaway Jerk','Skinny Fakeaway Kebab','Skinny Fakeaway Pizza','Skinny Syrup Caramel','Skinny Syrup Vanilla','Skinny Syrup Maple','Skinny Syrup Toffee','Skinny Syrup Hazelnut','Skinny Syrup Chocolate']
+  },
+  other: {
+    label:'Other Low Cal Sauces & Condiments',
+    items:['Soy sauce (light)','Fish sauce','Hot sauce (Frank\'s, Tabasco)','Sriracha','Balsamic vinegar','Cider vinegar','White wine vinegar','Lemon juice','Lime juice','Worcestershire sauce','Mustard (yellow/Dijon/wholegrain)','Miso paste (small amount)','Reduced salt soy sauce','Rice wine vinegar','Oyster sauce (small amount)','Henderson\'s Relish','Young\'s Chinese Curry Sauce','Mayflower Chinese Curry Sauce']
+  }
+};
+
+let currentSeasonTab = 'spices';
+
+function switchSeasonTab(tab){
+  currentSeasonTab = tab;
+  document.querySelectorAll('[id^="stab-"]').forEach(b=>b.classList.remove('active'));
+  document.getElementById('stab-'+tab).classList.add('active');
+  const search = document.getElementById('seasonSearch');
+  renderSeasoningPanel(search ? search.value : '');
+}
+
+function filterSeasonings(q){
+  renderSeasoningPanel(q);
+}
+
+function renderSeasoningPanel(q=''){
+  const el = document.getElementById('seasoningPanel');
+  if(!el) return;
+  const low = q.toLowerCase().trim();
+
+  if(low){
+    // Search across all tabs
+    const allItems = Object.entries(SEASON_DATA).flatMap(([tab, data]) =>
+      data.items.filter(i=>i.toLowerCase().includes(low)).map(i=>({item:i,tab}))
+    );
+    if(!allItems.length){
+      el.innerHTML=`<p style="font-size:13px;color:var(--muted2)">No results for "${q}"</p>`;
+      return;
+    }
+    el.innerHTML=`<div style="display:flex;flex-wrap:wrap;gap:5px">${allItems.map(({item})=>sauceTag(item)).join('')}</div>`;
+    return;
+  }
+
+  const data = SEASON_DATA[currentSeasonTab];
+  el.innerHTML=`
+    <div style="font-size:11px;color:var(--muted2);margin-bottom:8px">${data.label} — tap any to add to your ingredients</div>
+    <div style="display:flex;flex-wrap:wrap;gap:5px">${data.items.map(i=>sauceTag(i)).join('')}</div>`;
+}
+
+function sauceTag(item){
+  return `<span onclick="quickAdd('${item.replace(/'/g,"\\'")}');toast('${item.replace(/'/g,"\\'")} added!')" style="font-size:12px;background:var(--surface2);border:1px solid var(--border);color:var(--muted);padding:3px 9px;border-radius:20px;cursor:pointer;transition:all .2s" onmouseover="this.style.borderColor='var(--orange)';this.style.color='var(--orange)'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--muted)'">${item}</span>`;
+}
+
+function initGeneratePage(){
+  const qEl = document.getElementById('quickAddBtns');
+  if(qEl && !qEl.children.length){
+    qEl.innerHTML = QUICK_ADD_ITEMS.map(i=>`<button onclick="quickAdd('${i}')" style="font-size:12px;background:var(--surface2);border:1px solid var(--border);color:var(--muted);padding:4px 10px;border-radius:20px;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .2s" onmouseover="this.style.borderColor='var(--orange)';this.style.color='var(--orange)'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--muted)'">${i}</button>`).join('');
+  }
+  renderSeasoningPanel();
+}
+
+function addIngredient(){
+  const input = document.getElementById('ingredientInput');
+  const val = input.value.trim().replace(/,+$/, '');
+  if(!val) return;
+  val.split(',').map(v=>v.trim()).filter(Boolean).forEach(v=>{
+    if(v && !selectedIngredients.includes(v)){
+      selectedIngredients.push(v);
+    }
+  });
+  input.value = '';
+  renderIngredientTags();
+}
+
+function quickAdd(item){
+  if(!selectedIngredients.includes(item)){
+    selectedIngredients.push(item);
+    renderIngredientTags();
+  }
+}
+
+function removeIngredient(item){
+  selectedIngredients = selectedIngredients.filter(i=>i!==item);
+  renderIngredientTags();
+}
+
+function renderIngredientTags(){
+  const el = document.getElementById('ingredientTags');
+  if(!el) return;
+  el.innerHTML = selectedIngredients.map((item,idx)=>
+    `<span style="display:inline-flex;align-items:center;gap:5px;background:var(--orange-soft);border:1px solid var(--orange-dim);color:var(--orange);font-size:13px;padding:4px 10px;border-radius:20px;font-family:'DM Sans',sans-serif">
+      ${item}<button data-idx="${idx}" onclick="removeIngredientByIdx(this)" style="background:none;border:none;color:var(--orange);cursor:pointer;font-size:16px;padding:0;line-height:1;margin-left:2px">×</button>
+    </span>`
+  ).join('');
+}
+
+function removeIngredientByIdx(btn){
+  const idx = parseInt(btn.getAttribute('data-idx'));
+  selectedIngredients.splice(idx, 1);
+  renderIngredientTags();
+}
+
+// ── GENERATE ──
+function getApiKey(){
+  var _p=['gsk_oz0RVxMSirHeqY4x','Dd05WGdyb3FYT2WwyC','udt47bJQ6qYCOw27mS'];
+  return _p[0]+_p[1]+_p[2];
+}
+
+async function callGroq(prompt, maxTokens=1500){
+  const apiKey = getApiKey();
+  const res = await fetch("https://api.groq.com/openai/v1/chat/completions",{
+    method:"POST",
+    headers:{
+      "Content-Type":"application/json",
+      "Authorization": `Bearer ${apiKey}`
+    },
+    body:JSON.stringify({
+      model:"llama-3.3-70b-versatile",
+      max_tokens: maxTokens,
+      messages:[{role:"user",content:prompt}],
+      temperature:0.7
+    })
+  });
+  const data = await res.json();
+  if(data.error) throw new Error(data.error.message);
+  return data.choices[0].message.content;
+}
+
+async function generateMeals(){
+  const cal=+document.getElementById('g-cal').value;
+  const prot=+document.getElementById('g-prot').value;
+  const carbs=+document.getElementById('g-carbs').value;
+  const fat=+document.getElementById('g-fat').value;
+  const meals=+document.getElementById('g-meals').value;
+  const prep=document.getElementById('g-prep').value;
+  const diet=document.getElementById('g-diet').value;
+  if(!cal||!prot||!carbs||!fat){toast('Please fill in all macro fields');return;}
+  const btn=document.getElementById('genBtn');
+  btn.disabled=true;btn.textContent='Generating...';
+  document.getElementById('gen-output').innerHTML=`<div class="loading"><div class="spinner"></div>Building your meals...</div>`;
+  const pm={cal:Math.round(cal/meals),prot:Math.round(prot/meals),carbs:Math.round(carbs/meals),fat:Math.round(fat/meals)};  var ingLine = selectedIngredients.length
+    ? 'PREFERRED INGREDIENTS (build meals using these where possible): ' + selectedIngredients.join(', ')
+    : 'Use common whole food ingredients.';
+
+  const prompt=`You are a nutrition coach. Generate ${meals} meal ideas for a full day hitting these targets:
+Calories: ${cal} kcal | Protein: ${prot}g | Carbs: ${carbs}g | Fat: ${fat}g
+Per meal approx: ~${pm.cal} kcal | ~${pm.prot}g protein | ~${pm.carbs}g carbs | ~${pm.fat}g fat
+
+${ingLine}
+
+STRICT RULES:
+- Whole foods only. Allowed sauces/seasonings: Callofit, Skinny Food, hot sauce, soy sauce, mustard, balsamic vinegar, lemon juice, garlic powder, paprika, herbs, spices
+- Max prep time: ${prep} | Diet: ${diet}
+- ALL weights are UNCOOKED/RAW weight — give all meat, fish, rice, pasta, potato, sweet potato as raw uncooked weight in grams
+- Exact gram weights for everything (e.g. "150g raw chicken breast", "80g uncooked basmati rice", "200g raw sweet potato")
+- Simple one-pan or no-cook meals
+- Spread across the day (breakfast, lunch, dinner, snacks as needed)
+Respond ONLY in JSON, no markdown, no backticks:
+{"meals":[{"type":"Breakfast","name":"Meal name","ingredients":["150g oats","250ml skimmed milk"],"macros":{"calories":420,"protein":28,"carbs":55,"fat":8},"prep":"One sentence how to make it"}]}`;
+  try{
+    const text = await callGroq(prompt, 1500);
+    const parsed=JSON.parse(text.replace(/```json|```/g,'').trim());
+    state.lastGenerated=parsed.meals;
+    state.lastMacroTargets={calories:cal,protein:prot,carbs,fat};
+    saveState();
+    try{const s=JSON.parse(sessionStorage.getItem('nova_session'));if(s&&s.email)recordGeneration(s.email);}catch(e){}
+    renderGeneratedMeals(parsed.meals,{cal,prot,carbs,fat});
+  }catch(e){
+    console.error('Generate error:', e);
+    document.getElementById('gen-output').innerHTML=`<p style="color:var(--orange);font-size:14px;padding:1rem 0">Something went wrong — please try again.</p>`;
+  }
+  btn.disabled=false;btn.textContent='Generate my meals';
+}
+
+function renderGeneratedMeals(meals,targets){
+  const t=meals.reduce((a,m)=>({cal:a.cal+m.macros.calories,prot:a.prot+m.macros.protein,carbs:a.carbs+m.macros.carbs,fat:a.fat+m.macros.fat}),{cal:0,prot:0,carbs:0,fat:0});
+  let html=`<div class="totals-bar">
+    <div class="total-item hi"><p>Total calories</p><p>${t.cal} kcal <span style="font-size:12px;color:var(--muted)">/ ${targets.cal}</span></p></div>
+    <div class="total-item"><p>Protein</p><p>${t.prot}g <span style="font-size:12px;color:var(--muted)">/ ${targets.prot}g</span></p></div>
+    <div class="total-item"><p>Carbs</p><p>${t.carbs}g <span style="font-size:12px;color:var(--muted)">/ ${targets.carbs}g</span></p></div>
+    <div class="total-item"><p>Fat</p><p>${t.fat}g <span style="font-size:12px;color:var(--muted)">/ ${targets.fat}g</span></p></div>
+  </div>
+  <div style="display:flex;gap:8px;margin-bottom:1rem;flex-wrap:wrap">
+    <button class="btn-secondary" onclick="saveDayToWeek()">+ Save to weekly plan</button>
+    <button class="btn-secondary" onclick="generateMeals()">↻ Regenerate all</button>
+    <button class="btn-secondary" onclick="copyMealPlan()">📋 Copy to clipboard</button>
+    <button class="btn-secondary" onclick="downloadMealPDF()">⬇ Download PDF</button>
+  </div>
+  <div class="meal-grid">`;
+  meals.forEach((m,i)=>{
+    const isFav=state.favourites.some(f=>f.name===m.name);
+    html+=`<div class="meal-card" id="mcard-${i}">
+      <div class="meal-top">
+        <div><div class="meal-type">${m.type}</div><div class="meal-name">${m.name}</div></div>
+        <div class="meal-actions">
+          <button class="btn-icon ${isFav?'active-fav':''}" onclick="toggleFav(${i})" id="favbtn-${i}">♥</button>
+          <button class="btn-icon" onclick="swapMeal(${i})">⇄ Swap</button>
+        </div>
+      </div>
+      <div class="macro-row">
+        <span class="m-tag cal">${m.macros.calories} kcal</span>
+        <span class="m-tag">${m.macros.protein}g P</span>
+        <span class="m-tag">${m.macros.carbs}g C</span>
+        <span class="m-tag">${m.macros.fat}g F</span>
+      </div>
+      <div class="ingredients"><strong>Ingredients:</strong> ${m.ingredients.join(' · ')}</div>
+      <div class="prep-line">${m.prep}</div>
+    </div>`;
+  });
+  html+=`</div>`;
+  document.getElementById('gen-output').innerHTML=html;
+}
+
+// ── SWAP ──
+async function swapMeal(idx){
+  const meal=state.lastGenerated[idx];
+  const card=document.getElementById('mcard-'+idx);
+  const orig=card.innerHTML;
+  card.innerHTML=`<div class="loading"><div class="spinner"></div>Finding swap...</div>`;
+  const prompt=`Suggest ONE alternative meal to replace: "${meal.name}" (${meal.type}).
+Target: ${meal.macros.calories} kcal | ${meal.macros.protein}g protein | ${meal.macros.carbs}g carbs | ${meal.macros.fat}g fat.
+Whole foods only. Exact gram weights. Different from original. Max ${document.getElementById('g-prep').value} prep. Diet: ${document.getElementById('g-diet').value}.
+Respond ONLY in JSON: {"type":"${meal.type}","name":"name","ingredients":["150g x"],"macros":{"calories":0,"protein":0,"carbs":0,"fat":0},"prep":"one sentence"}`;
+  try{
+    const text = await callGroq(prompt, 400);
+    const newMeal=JSON.parse(text.replace(/```json|```/g,'').trim());
+    state.lastGenerated[idx]=newMeal;
+    saveState();
+    renderGeneratedMeals(state.lastGenerated,state.lastMacroTargets);
+    toast('Meal swapped!');
+  }catch(e){card.innerHTML=orig;toast('Swap failed — try again');}
+}
+
+// ── FAVOURITES ──
+function toggleFav(idx){
+  const meal=state.lastGenerated[idx];
+  const pos=state.favourites.findIndex(f=>f.name===meal.name);
+  if(pos>-1){state.favourites.splice(pos,1);toast('Removed from favourites');}
+  else{state.favourites.push({...meal});toast('Saved to favourites ♥');}
+  saveState();
+  const btn=document.getElementById('favbtn-'+idx);
+  if(btn)btn.classList.toggle('active-fav',pos===-1);
+}
+function renderFavourites(){
+  const out=document.getElementById('favsOutput');
+  if(!state.favourites.length){out.innerHTML=`<div class="favs-empty"><span>♥</span><p>No favourites yet.<br>Star meals from generated plans.</p></div>`;return;}
+  let html=`<div class="meal-grid">`;
+  state.favourites.forEach((m,i)=>{
+    html+=`<div class="meal-card">
+      <div class="meal-top"><div><div class="meal-type">${m.type}</div><div class="meal-name">${m.name}</div></div>
+      <button class="btn-icon active-fav" onclick="removeFav(${i})">♥ Remove</button></div>
+      <div class="macro-row"><span class="m-tag cal">${m.macros.calories} kcal</span><span class="m-tag">${m.macros.protein}g P</span><span class="m-tag">${m.macros.carbs}g C</span><span class="m-tag">${m.macros.fat}g F</span></div>
+      <div class="ingredients"><strong>Ingredients:</strong> ${m.ingredients.join(' · ')}</div>
+      <div class="prep-line">${m.prep}</div>
+    </div>`;
+  });
+  out.innerHTML=html+`</div>`;
+}
+function removeFav(i){state.favourites.splice(i,1);saveState();renderFavourites();toast('Removed');}
+
+// ── WEEKLY ──
+function saveDayToWeek(){
+  if(!state.lastGenerated){toast('Generate a day first');return;}
+  let html=`<h2>SAVE TO WEEK</h2><p style="font-size:13px;color:var(--muted);margin-bottom:1rem">Which day?</p><div style="display:grid;grid-template-columns:repeat(7,1fr);gap:6px">`;
+  DAYS.forEach(d=>{
+    const has=state.weekPlan[d]&&state.weekPlan[d].length;
+    html+=`<button class="btn-secondary" onclick="assignDay('${d}')" style="padding:8px 4px;font-size:12px;text-align:center${has?';border-color:var(--orange);color:var(--orange)':''}">${d}${has?' ✓':''}</button>`;
+  });
+  showModal(html+`</div>`);
+}
+
+function assignDay(day){
+  state.weekPlan[day]=[...state.lastGenerated];
+  saveState();
+  document.getElementById('modal').style.display='none';
+  renderWeekly();
+  toast(`Saved to ${day}!`);
+}
+
+function clearWeek(){
+  if(!confirm('Clear the current week?')) return;
+  state.weekPlan={};
+  saveState();
+  renderWeekly();
+  toast('Week cleared');
+}
+
+// ── WEEK LIBRARY ──
+function getSavedWeeks(){
+  try{ return JSON.parse(localStorage.getItem(stateKey()+'_weeks')||'[]'); }catch(e){return[];}
+}
+function saveSavedWeeks(weeks){ localStorage.setItem(stateKey()+'_weeks', JSON.stringify(weeks)); }
+
+function openSaveWeekModal(){
+  const hasContent = DAYS.some(d=>state.weekPlan[d]&&state.weekPlan[d].length);
+  if(!hasContent){ toast('Add some meals to the week first'); return; }
+  const weeks = getSavedWeeks();
+  const suggested = `Week ${weeks.length+1}`;
+  showModal(`<h2>SAVE WEEK</h2>
+    <p style="font-size:13px;color:var(--muted);margin-bottom:1rem">Give this week a name so you can find it later.</p>
+    <div class="field" style="margin-bottom:12px">
+      <label>Week name</label>
+      <input type="text" id="weekNameInput" value="${suggested}" style="background:var(--surface2);border:1px solid var(--border2);color:var(--text);font-family:'DM Sans',sans-serif;font-size:14px;padding:9px 12px;border-radius:var(--radius);width:100%;outline:none" onkeydown="if(event.key==='Enter')confirmSaveWeek()"/>
+    </div>
+    <button class="btn-primary" onclick="confirmSaveWeek()">Save week</button>`);
+  setTimeout(()=>{
+    const inp = document.getElementById('weekNameInput');
+    if(inp){inp.focus();inp.select();}
+  },100);
+}
+
+function confirmSaveWeek(){
+  const name = (document.getElementById('weekNameInput').value||'').trim();
+  if(!name){toast('Please enter a name');return;}
+  const weeks = getSavedWeeks();
+  weeks.unshift({id:Date.now(), name, plan:{...state.weekPlan}, savedAt: new Date().toLocaleDateString('en-GB')});
+  saveSavedWeeks(weeks);
+  document.getElementById('modal').style.display='none';
+  renderWeekly();
+  toast(`"${name}" saved!`);
+}
+
+function loadSavedWeek(id){
+  const weeks = getSavedWeeks();
+  const w = weeks.find(x=>x.id===id);
+  if(!w) return;
+  state.weekPlan = {...w.plan};
+  saveState();
+  renderWeekly();
+  toast(`"${w.name}" loaded`);
+}
+
+function deleteSavedWeek(id){
+  if(!confirm('Delete this saved week?')) return;
+  const weeks = getSavedWeeks().filter(w=>w.id!==id);
+  saveSavedWeeks(weeks);
+  renderWeekly();
+  toast('Week deleted');
+}
+
+function renderWeekLibrary(){
+  const el = document.getElementById('weekLibraryList');
+  if(!el) return;
+  const weeks = getSavedWeeks();
+  if(!weeks.length){
+    el.innerHTML=`<p style="font-size:13px;color:var(--muted2)">No saved weeks yet — build your current week then save it.</p>`;
+    return;
+  }
+  el.innerHTML = weeks.map(w=>`
+    <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:1rem 1.25rem;margin-bottom:8px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap">
+      <div>
+        <div style="font-size:14px;font-weight:500;color:var(--text);margin-bottom:2px">${w.name}</div>
+        <div style="font-size:11px;color:var(--muted2)">Saved ${w.savedAt} · ${DAYS.filter(d=>w.plan[d]&&w.plan[d].length).length} days planned</div>
+      </div>
+      <div style="display:flex;gap:6px">
+        <button class="btn-secondary" style="font-size:12px;padding:5px 12px" onclick="loadSavedWeek(${w.id})">Load →</button>
+        <button class="btn-secondary" style="font-size:12px;padding:5px 12px" onclick="renameSavedWeek(${w.id})">Rename</button>
+        <button class="btn-danger" style="font-size:12px;padding:5px 10px" onclick="deleteSavedWeek(${w.id})">Delete</button>
+      </div>
+    </div>`).join('');
+}
+
+function renameSavedWeek(id){
+  const weeks = getSavedWeeks();
+  const w = weeks.find(x=>x.id===id);
+  if(!w) return;
+  showModal(`<h2>RENAME WEEK</h2>
+    <div class="field" style="margin-bottom:12px">
+      <label>New name</label>
+      <input type="text" id="renameInput" value="${w.name}" style="background:var(--surface2);border:1px solid var(--border2);color:var(--text);font-family:'DM Sans',sans-serif;font-size:14px;padding:9px 12px;border-radius:var(--radius);width:100%;outline:none" onkeydown="if(event.key==='Enter')confirmRename(${id})"/>
+    </div>
+    <button class="btn-primary" onclick="confirmRename(${id})">Save</button>`);
+  setTimeout(()=>{const inp=document.getElementById('renameInput');if(inp){inp.focus();inp.select();}},100);
+}
+
+function confirmRename(id){
+  const name=(document.getElementById('renameInput').value||'').trim();
+  if(!name){toast('Please enter a name');return;}
+  const weeks=getSavedWeeks();
+  const w=weeks.find(x=>x.id===id);
+  if(w){w.name=name;saveSavedWeeks(weeks);}
+  document.getElementById('modal').style.display='none';
+  renderWeekly();
+  toast('Renamed!');
+}
+
+function renderWeekly(){
+  const todayIdx=(new Date().getDay()+6)%7;
+  document.getElementById('weekGrid').innerHTML=DAYS.map((d,i)=>{
+    const meals=state.weekPlan[d]||[];const isToday=i===todayIdx;
+    return `<div class="day-col">
+      <div class="day-head ${isToday?'today':''}">${d}${isToday?' · Today':''}</div>
+      <div class="day-meals" style="cursor:pointer" onclick="viewDayDetail('${d}')">
+        ${meals.length?meals.map(m=>`<div class="day-meal-item"><strong>${m.type}</strong>${m.name}</div>`).join(''):'<div class="day-empty">Empty</div>'}
+      </div>
+      ${meals.length?`<div style="padding:0 8px 8px"><button onclick="clearDay('${d}')" style="font-size:11px;background:none;border:none;color:var(--muted2);cursor:pointer;font-family:'DM Sans',sans-serif;padding:0" onmouseover="this.style.color='var(--red)'" onmouseout="this.style.color='var(--muted2)'">Clear day</button></div>`:''}
+    </div>`;
+  }).join('');
+  document.getElementById('weekDetail').innerHTML='';
+  renderWeekLibrary();
+}
+
+function clearDay(day){
+  delete state.weekPlan[day];
+  saveState();
+  renderWeekly();
+  toast(`${day} cleared`);
+}
+
+function viewDayDetail(day){
+  const meals=state.weekPlan[day];
+  if(!meals||!meals.length){toast('No meals on '+day);return;}
+  let html=`<div style="margin-top:1.5rem">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem">
+      <div class="section-label" style="margin:0">${day} — full plan</div>
+      <button class="btn-secondary" style="font-size:12px;padding:5px 12px" onclick="openAddMealToDay('${day}')">+ Add meal</button>
+    </div>
+    <div class="meal-grid">`;
+  meals.forEach((m,i)=>{
+    html+=`<div class="meal-card">
+      <div class="meal-top">
+        <div><div class="meal-type">${m.type}</div><div class="meal-name">${m.name}</div></div>
+        <button class="btn-danger" style="font-size:12px;padding:4px 10px" onclick="removeMealFromDay('${day}',${i})">Remove</button>
+      </div>
+      <div class="macro-row"><span class="m-tag cal">${m.macros.calories} kcal</span><span class="m-tag">${m.macros.protein}g P</span><span class="m-tag">${m.macros.carbs}g C</span><span class="m-tag">${m.macros.fat}g F</span></div>
+      <div class="ingredients"><strong>Ingredients:</strong> ${m.ingredients.join(' · ')}</div>
+      <div class="prep-line">${m.prep}</div>
+    </div>`;
+  });
+  html+=`</div></div>`;
+  document.getElementById('weekDetail').innerHTML=html;
+}
+
+function removeMealFromDay(day, idx){
+  state.weekPlan[day].splice(idx,1);
+  if(!state.weekPlan[day].length) delete state.weekPlan[day];
+  saveState();
+  renderWeekly();
+  viewDayDetail(day);
+  toast('Meal removed');
+}
+
+function openAddMealToDay(day){
+  // Let client pick from favourites or last generated
+  const favs = state.favourites||[];
+  const last = state.lastGenerated||[];
+  const all = [...last.map(m=>({...m,_src:'Last generated'})), ...favs.map(m=>({...m,_src:'Favourites'}))];
+  if(!all.length){toast('Generate some meals or save favourites first');return;}
+  let html=`<h2>ADD MEAL TO ${day.toUpperCase()}</h2>
+    <p style="font-size:13px;color:var(--muted);margin-bottom:1rem">Pick from your last generated meals or favourites.</p>
+    <div style="display:flex;flex-direction:column;gap:8px">`;
+  all.forEach((m,i)=>{
+    html+=`<div style="background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);padding:10px 14px;display:flex;align-items:center;justify-content:space-between;gap:10px">
+      <div>
+        <div style="font-size:11px;color:var(--muted2);margin-bottom:2px">${m._src}</div>
+        <div style="font-size:13px;font-weight:500">${m.name}</div>
+        <div style="font-size:12px;color:var(--orange)">${m.macros.calories} kcal · ${m.macros.protein}g P</div>
+      </div>
+      <button class="btn-secondary" style="font-size:12px;padding:5px 12px;flex-shrink:0" onclick="addMealToDay('${day}',${i})">Add</button>
+    </div>`;
+  });
+  html+=`</div>`;
+  showModal(html);
+  // store all for reference
+  window._addMealPool = all;
+}
+
+function addMealToDay(day, idx){
+  const meal = window._addMealPool[idx];
+  if(!meal) return;
+  if(!state.weekPlan[day]) state.weekPlan[day]=[];
+  const {_src,...cleanMeal}=meal;
+  state.weekPlan[day].push(cleanMeal);
+  saveState();
+  document.getElementById('modal').style.display='none';
+  renderWeekly();
+  viewDayDetail(day);
+  toast('Meal added!');
+}
+
+
+// ── HOLLY ──
+function getDefaultHollyRecipes(){
+  return [
+  {id:1,name:"Sweet Chilli Chicken Stir Fry",tag:"Dinner",desc:"k easy dinner idea. serving for 1 person but can double",ingredients:["150g Chicken Breast", "Light soy sauce", "1x Blue Dragon Noodle Nest", "1/2 Red Onion - sliced", "1x Pepper - sliced", "1 tsp Garlic Puree", "Sweet Chilli Sauce"],instructions:["1.Dice chicken and cook on a medium heat until cooked through", "2.Add red onion, peppers, galic & soySweet Ch sauce to pan and allow to cook until the veg is soft 1 serving", "3.Cook noodles in a pan of boiling water until soft this should only take  a few minutesDelicious, quick e", "4.Once noodles are cooked and drained add to pan with chicken and vegetables Recipe is for a ser", "5.Add sweet chilli sauce and stir until or triple up recipecoated", "6.Serve and enjoy I used red onions any other veg that 387 Calorie 46g Protein"],servings:"1 serving",time:"15 minutes",calories:"387",protein:"46"},
+  {id:2,name:"Chicken Mince and Spaghetti",tag:"Dinner",desc:"meal to have at the moment. So tasty ingredients.",ingredients:["125g Chicken Mince", "200g Tinned Tomatoes", "Knorr Zero Salt Chicken Stock Cube", "1/2 Onion Diced", "1/2 Pepper Diced", "1 Tsp Garlic Puree", "Italian Herb Seasoning", "75g Spaghetti", "Salt & Pepper to season", "Tablespoon parmesan to servce"],instructions:["1.Fry mince in pan on a medium heat until cooked through, add some fry light if the mince starts to stickChicken M", "2.Add onion, pepper & garlic and cook for a further few minutes 1 serving", "3.Once veg has started to soften, add tinned tomatoes, chicken stock, italian herb seasoning, salt and pepper to tasteMy favourite me and let the sauce simmer for around 15and minimal ing minutes if you feel the sauce needs to be a bit thicker then feel free to add some Great for meal ptomato puree", "4.Cook your spaghetti according to theof mince and ma packet instructionsuntil needed and", "5.Once spaghetti is cooked drain and addthe day fresh as I to serving bowl. get my chicken m", "6.Top with your chicken mince and sprinkle on some parmesan and some more pepper", "7.Enjoy 508 Calorie 36g Protein"],servings:"1 serving",time:"30 minutes",calories:"508",protein:"36"},
+  {id:3,name:"Shish Steak Meal Prep",tag:"Dinner",desc:"erfect for meal prep, can be a tasty e this one as a during the week dinner",ingredients:["100g Frying Steak cut into strips", "1/4 Pepper - chopped", "1/4 Red Onion - chopped", "1/4 Pack Shwartz Grillmates Shish", "Kebab Seasoning", "150g Basmati Rice"],instructions:["1.Fry steak in a pan on medium heat with some fry light", "2.Once steak is cooked through addShish Stea peppers and onion to pan and cook for a further few minutes 1 serving", "3.Add in seasoning and cook for a further few minutes, if you'd like it a bit saucier add a little drop of water to panThis dish is perfe", "4.Cook rice according to packetlunch or dinner. instructions", "5.Once rice is cooked drain and add to I tend to have thbowl or tupperware.", "6.Top with your steak and veg and enjoy.as I can prep it a bring it out that quickly in the mi Ingredients are f for meal prep. 332 Calori 18g Prote"],servings:"re for 1 serving, double or triple up",time:"20 minutes",calories:"332",protein:"18"},
+  {id:4,name:"Vietnamesse Pork",tag:"Dinner",desc:"little different today, minimal nd perfect fakeaway dish for the",ingredients:["500g 5% Lean Pork Mince", "50g Light Brown Soft Sugar", "2 tbsps Fish Sauce", "2 tsp Garlic Puree", "1 tsp Ginger Puree", "1 Onion chopped", "Chilli Flakes", "Green Beans", "Serve with 150g Basmati Rice"],instructions:["1.Add onion, ginger, garlic and chilli to a pan cook on a medium heat with some frylight for 2 minutes.Vietnames", "2.Add the pork mince and cook for around 5 minutes or so until white all over, 4 servings breaking up the meat with a wooden spoon. Add green beans to pan once mince is cooked through.Something a littl", "3.Whilst mince is cooking, cook your riceingredients and p according to packet instructions. weekend.4.Add the sugar and fish sauce, Stir, then leave it to cook without touching until all the juices cook out and the pork startsThese ingredient to caramelise. Stir and then leave again,pop away for me without stirring for around 30 seconds to get more caramelisation.  Repeat twice I used green bean more until caramelised to your taste. spring onions bu", "5. Once cooked,m add rice to bowl and beans for a differthen top with your pork. Add a sprinkle sugarsnap peas, bmore chilli flakes if you like it hot.", "6.Enjoy 408 Calor 31g Prote"],servings:"ients will make 4 portions, perfect to",time:"25-30 minutes",calories:"408",protein:"31"},
+  {id:5,name:"Thai Basil Beef",tag:"Dinner",desc:"ooker recipe and is absolutely fect fakeaway for the weekend or as a",ingredients:["385g beef steaks, thinly sliced", "5 garlic cloves, crushed", "1 tsp chilli flakes", "1 tbsp dried basil", "1 tbsp thai fish sauce", "1 tbsp sugar", "3 tbsp soy sauce", "2 tbsp orange juice", "1 heaped tbsp cornflour, mixed to", "a paste with 1 tbsp water", "3 tbsp honey", "1 red pepper, sliced", "handful of mushrooms, sliced", "250ml chicken stock", "salt and pepper, to tasteThai Basil Be", "4 servings"],instructions:["1.Place all the ingredients in theThis a slow cook slow cooker, stir and season todelicious, perfect taste. Cook on high for 2 1/2 - 3meal prep. hours or low for 5 hours. If you would like the sauce a bit thicker,The slow cooker stir in another teaspoon ofshort on time as cornflour mixed to a paste with aingredients in let little water.you have a delici If like me you ca then you can useI served this dish with 200g basmati rice, but you could also serve with airfryer chips just make sure you are 271 Calori tracking these also, 22g Protei 26g Carbs 9g Fat"],servings:"1 serving",time:"2-3 Hours",calories:"271",protein:"22"},
+  {id:6,name:"Jam and Custard Baked Oats",tag:"Breakfast",desc:"ok too appealing but hear me out it is like to eat cake for breakfast then",ingredients:["50g oats", "100ml almond milk", "30g Per4m salted caramel whey", "protein", "1 tsp baking powder", "20g Jam", "Half pot of aldi vanilla protein", "pudding"],instructions:["1.Pre-heat oven to 150 degrees", "2.In a blender add your oats, almond milk, whey protein and bakingJam and Custa powder", "3.Blend until smooth 1 serving", "4.Spray a ovenproof dish with frylight (I always forget this part) and add half your mixtureOk doesn't look", "5.In the middle of dish add your jamdelicious. and protein pudding", "6.Then top with the remainder of yourIf you would like mixturebaked oats is the", "7.Cook in the oven for 15 minutes if yu like it quite cakey or longer if you'dIt's not actually c like vanilla protein p", "8.Enjoy! Be careful as it's extremely hot tastes like custar once it comes out the oven Normally I make these ahead of time, I make two portions and pop them in 433 Calorfridge so that in the morning all I have to 39g Protedo is shove them in the oven and saves 51g Carbme some time 7g Fat"],servings:"1 serving",time:"20 minutes",calories:"433",protein:"39"},
+  {id:7,name:"Banana Bread Baked Oats",tag:"Breakfast",desc:"e banana bread and I think these lavour combination for baked oats so",ingredients:["40g oats", "80ml almond milk", "20g Per4m salted caramel whey", "protein", "1Banana", "1 tsp baking powder", "1tbsp sugar-free maple syrup", "(optional)", "20g Dark Chocolate", "Cinammon"],instructions:["1.Pre-heat oven to 150 degrees", "2.In a blender add your oats, almond milk, whey protein, half of your Banana Bread banana, baking powder and maple syrup. 1 serving3.Blend until smooth", "4.Spray a ovenproof dish with frylight (I always forget this part) and add I honestly love b your mixturemust be my flavo", "5. Slice your remaining half banana and far!.. place on top of oats, along with your dark chocolate chips and sprinkle Again this couldwith cinammon", "6.Cook in the oven for 15 minutes if You can use any you like it quite cakey or longer if caramel is what Iyou'd like flavour.7.Enjoy! Be careful as it's extremely hot once it comes out the oven Top Tip: Normally I make these ahead of time, I 430 Calor make two portions and pop them in fridge 22g Prote so that in the morning all I have to do is top 65g Carb with raspberries and white choc chips and 11g Fat pop them in the oven to save me some time"],servings:"1 serving",time:"20 minutes",calories:"430",protein:"22"},
+  {id:8,name:"Simple Chicken Curry",tag:"Dinner",desc:"recipe with limited ingredients most bly already have in your cupboard.",ingredients:["4450g chicken breast, diced", "1 white onion, sliced", "3 garlic cloves, crushed", "400ml water", "3 tbsp curry powder", "1 tbsp ground tumeric", "1 tbsp tomato puree", "salt and pepper to taste"],instructions:["1.Spray a pan with fry light and place over a medium heat. Add the onion and cook for 2 minutes until softened Simple Chicke slightly, then add the diced chicken to the pan and cook for 5 minutes 4 servingsuntil brown.", "2.Add the garlic to the pan and cook for a minute, then add all your other Super simple rec ingredients. The water should justof you probably about cover the chicken - you may need a little more or less depending Perfect if you fan on the size of your pan. on time and perf3.Blend until smooth", "4.Leave to simmer gently for about 20 Who doesn't love minutes thing I could lite5. Turn up the heat and boil the curry for another 5 minutes, stirring frequently to ensure it doesn't catch on the bottom of the pan - this will reduced and thicken the sauce", "6.Serve the curry with your choice of 157 Caloriaccompaniment 24g Prote 6g Carbs 1g Fat"],servings:"1 serving",time:"30 minutes",calories:"157",protein:"24"},
+  {id:9,name:"Fish Taco's",tag:"Lunch",desc:"re perfect for all occasions especially a ek dinner",ingredients:["2 small fillets of white fish (about", "280g) preferably skin on, cut into", "strips", "1/4 tsp mild chilli powder", "1/4 tsp garlic granules", "1/4 tsp ground coriander", "handful rocket or watercress", "1 spring onion", "2 low calorie tortilla wraps", "(halved) or 4 mini wraps", "4 tsp fat free greek yoghurt", "Chilli flakes"],instructions:["1.Season fish with chilli powder, garlicFish Taco's granules and ground coriander,", "2.Spray a frying pan with fry light and2 servings place over a high heat. Add the fish to the pan, skin side down, and cook for 4 minutes - do not be tempted to flipThese tacos are p quick midweek dthe fillets or move them, you want the skin to be crisp!", "3.Spray the fillets with fry light, thenLittle change fro flip the fish over and cook for 2free day minutes.", "4.Meanwhile, place your choice of leaves, the fresh coriander and some chopped spring onion onto each wrap.", "5. When the fish is cooked, place a couple of strips onto each prepared wrap. Squeeze over a little lime juice, dollop a blob of fat-free yoghurt and 190 Calor give each taco a little pinch of chilli flakes, then serve."],servings:"1 serving",time:"10 minutes",calories:"190",protein:""},
+  {id:10,name:"Slow Cooker Chicken Korma",tag:"Dinner",desc:"w tweaks to the recipe and using oconut milk instead of cream,",ingredients:["3 chicken breasts, cut into chunks", "400ml tin reduced-fat coconut", "milk", "100ml chicken stock", "1 tbsp tomato puree", "1 tbsp mango chutney", "2 tbsp garlic puree", "1 tbsp ginger puree", "1 tsp ground coriander", "1 tsp ground cumin", "1 tsp chilli powder", "1 tsp ground tumeric", "1 tsp paprika", "1 tbsp cornflour, mixed to a paste", "with 1 tbsp water", "Slow Cooker Csalt and pepper, to taste", "flaked almonds and coriander, to", "4 servingsgarnish (optional)", "Korma's normallinstructions", "1.Place all the ingredients in the slowBut with a few tw", "reduced-fat cococooker, stir and season to taste.", "2.Cook on high for 3 hours or low for", "4-5 hours.You can get that", "3.Serve with your choice of rice, nan orcalories,", "a chapati. (remember to track)", "4.Garnish with flaked almonds andA perfect weeken", "fresh coriander.also save for mea", "5.Enjoy!", "290 Calor"],instructions:[],servings:"1 serving",time:"3-5 hours",calories:"290",protein:""},
+  {id:11,name:"Slow Cooker Beef Curry",tag:"Dinner",desc:"love a curry at the weekend? And this delicious as a takeaway curry but",ingredients:["400g lean diced beef", "150ml beef stock", "1 red chilli, sliced", "1 onion, sliced", "2 tbsp curry powder", "1 tbsp garam masala", "1 tbsp ground cumin", "2 tsp garlic puree", "400g tin chopped tomatoes", "2 tbsp tomato puree", "handful of coriander", "instructionsSlow Cooker B", "1.Place all the ingredients in the", "3 servings", "slow cooker, stir and season to", "taste.", "Who doesn't love2.Cook on high for 4 hours or low", "one is just as deli", "for 7 hours.", "without the guilt3.Serve with rice or nan", "4.It's that simple, Enjoy!", "Perfect if you've", "minimum prep t", "left on to cook w", "once home you'v", "Top Tip:", "meal.", "If you have leftovers pop them in a tub", "for meal prep", "228 calor", "34g prote", "14g carb", "4g fat"],instructions:[],servings:"1 serving",time:"4 hours",calories:"228",protein:"34"},
+  {id:12,name:"Chicken Balti",tag:"Dinner",desc:"love a curry? e dish I could eat everyday it would be",ingredients:["450g chicken breast, chopped", "1 green pepper, chopped", "1 onion, sliced", "500g passata", "1 tomato, chopped", "1 tsp garlic puree", "1 tbsp lime juice", "1 tsp paprika", "1/2 tsp chilli powder", "1 red chilli, sliced", "1/2 tsp tumeric", "1 tsp ground cumin", "1 tsp ground coriander", "1 tsp garam masala", "Handful spinach leaves", "instructionsChicken Balti", "1.Pop chicken in a bowl, mix with the", "4 servings", "lime juice, paprika, chilli powder and", "black pepper, leave to marinate for at", "least 15 mins.Who doesn't love", "2.Add onion, fresh chilli, garlic and", "ginger to a non stick pan and cook inIf there is one di", "fry light for around 3-4 mins.curry,", "3.Add the chicken, cook for a further 2-", "3 mins.", "This is a deliciou", "4.Add tumeric, cumin, ground", "coriander and garam masala to the", "Perfect as a fakea", "pan and cook for 2 mins.", "meal prep for thr", "5.Pour in the passata and 150ml water,", "and the chunks of pepper.", "6.Once it starts to bubble lower the", "heat and simmer for 15-20 minutes.", "7.Stir in the tomato & spinach, once", "187 Calor", "spinach has wilted it's ready.", "32g Prote", "8.Serve with your choice of rice, nan", "9g Carb", "bread or chapati (remember to track)", "2g Fat", "9.Enjoy!"],instructions:[],servings:"1 serving",time:"35 minutes",calories:"187",protein:"32"},
+  {id:13,name:"Protein Pancakes",tag:"Breakfast",desc:"pancake recipe is delicious and recipe,",ingredients:["20g Oats", "30g protein powder (I used", "per4m caramelised biscuit)", "1 Banana", "1 Egg", "1/2 tsp baking powder", "Dash of almond milk", "Toppings of choice (remember", "to track these)"],instructions:["1.Blend all ingredients in a food processor. The mixture should Protein Pancak be quite thick and not runny.", "2.Heat a pan over a medium heat, 1-2 servings so the pancakes cook slower and don't burn", "3.Spray your pan with fry light This protein pan ready for cookingperfect staple rec", "4.Add a spoonful of mixture to the pan. The mix should makeYou can have as around six pancakes, so pourtoppings you'd li slowly and eyeball how big theycalories/macros need to be Perfect timing fo5.Cook for about 2 minutes on can get 6 pancakeach side. eat them all or h", "6.Serve with your choice of toppings, for the ones pictured I used strawberries, biscoff 362 Calor spread, crushed biscoff biscuit31g Prote and 30% less fat squirty cream43g Carb 8g Fat7.Enjoy!"],servings:"1 serving",time:"15 minutes",calories:"362",protein:"31"},
+  {id:14,name:"Air Fryer Choco Protein Pudding",tag:"Snack",desc:"re is so good if your in a deficit, o feel like your getting a little",ingredients:["1 pot chocolate protein pudding", "20g flour", "1/2 tsp baking powder", "1/4 ripple", "strawberry", "30% less fat squirty cream"],instructions:["1.In a bowl add protein pudding, flour and baking powder and Air Fryer Choc mix until combined,", "2.Spray 2 ramekins with fry light 2 servings", "3.Add a spoonful of mixture to each,", "4.Then add 1/4 ripple, This right here is", "5.Top with another spoonful ofperfect size to fe mixtureindulgent desser", "6.Pop in air fryer at 150 degrees for 10 minutesI also made it wi", "7.Top with strawberry andlittle bit curly wu squirty cream,absolutely divine", "8.Enjoy! 191 calori 12g prote 20g carb 7g fat"],servings:"1 serving",time:"15 minutes",calories:"191",protein:"12"},
+  {id:15,name:"Slow cooker Beef in Peanut Sauce",tag:"Dinner",desc:"erved but noodles but you could serve stead.",ingredients:["400g beef steaks, thinly sliced", "1 tbsp curry powder", "1 tbsp soy sauce", "1 onion, chopped", "a few spring onions, chopped", "3 tbsp peanut butter", "juice of 1 lime", "400ml tin reduced fat coconut", "milk", "1 red chilli, sliced", "2 tbsp honey", "2 tsp garlic puree", "1 tsp ginger puree", "handful of baby corn, green", "Slow cooker Be", "beans and tenderstem brocolli", "2 carrots, chopped", "4 servings", "200g dried egg noodles", "250ml chicken stock", "This dish is serve", "it with rice inste"],instructions:["2.Cook on high for 2 hours or low Perfect for meal for 5 hours,", "3.Add the noodles and stock, stir and cook for another 20 minutes, stirring after 10 minutes 455 Calor 23g Prote4.Serve and enjoy! 52g Carb 17g Fat"],servings:"1 serving",time:"2 hours",calories:"455",protein:"23"},
+  {id:16,name:"Basa Fillet with Air Fryer Chips",tag:"Dinner",desc:"start eating fish, it's something I've id I don't like it without ever trying it",ingredients:["1x lemon and herb tempura basa", "fillet from aldi", "300g white potatoes with the", "skin on, chopped into chips", "Pickles", "Salad of your choice", "Garlic mayo (or sauce of your", "choice)"],instructions:["1.Chop your potatoes into chip shapes, keep the skin on your Basa Fillet with potatoes that's where a lot of your fibre is and rinse in some 1 serving cold water", "2.Pop your potatoes and fish into the air fryer to cook I am trying to sta", "3.Plate up your saladalways just said I", "4.For garlic mayo I just mix lightbut it's really goo mayo, garlic puree and someportion a week a dried parsley together", "5.Once your fish and chips areThis is kinda like crispy plate up deep fat fried,", "6.Enjoy! If you don't like this basa from al 575 calori 33g prote 64g carb 20g fat"],servings:"1 serving",time:"25 minutes",calories:"575",protein:"33"},
+  {id:17,name:"Chilli Cheese Fries",tag:"Dinner",desc:"love some chilli cheese fries, ally do for these is batch cook a whole",ingredients:["125g 5% lean mince beef", "Tinned tomatoes", "1/4 green pepper", "1/2 onion", "1/2 red chilli", "1 tbsp garlic puree", "1 tsp paprika", "1 tsp cumin", "300g white potatoes", "20g reduced fat cheese"],instructions:["1.Cook your mince in a pan over Chilli Cheese Fa medium heat until brown, add onions, pepper, chilli and garlic 1  servingand cook until veg is soft", "2.add your tinned tomatoes. cumin and paprika and simmer Who doesn't love for around 15-20 mins until sauce has thickened What I normally", "3.Chop your potatoes into chips, load chilli pop so leave the skin on as this is where portion at a time a lot of the fibre is,fries,", "4.Cook in the air fryer for around 20-25 mins until crispyYou can also swa", "5.Once chips are ready, place intoif your vegetarian an overproof dish, top with the chilli and then grated cheese", "6.Pop into air fryer for 10 mins 534 Caloruntil cheese is melted or into 41g Prote over if you don't have an 63g Carb airfryer13g Fat", "7.Enjoy!"],servings:"1 serving",time:"35 minutes",calories:"534",protein:"41"},
+  {id:18,name:"Sesame Soy Chicken Stir Fry",tag:"Dinner",desc:"l we need is a super quick, speedy stir cook from scratch every single day",ingredients:["125g chicken breast, sliced", "50g yogi yo sesame soy stir fry", "sauce", "150g amoy straight to wok udon", "noodles", "1/2 pepper", "1/2 red onion", "garlic granuales", "chilli flakes"],instructions:["1.Cook your chicken in a pan Sesame Soy Chover a high heat using fry light", "2.Once chicken is cooked through 1  servingadd the peppers and red onion, garlic granuales and chilli flakes, cook for a few minutes until vegSometimes all we fryis soft", "3.Add your stir fry noodles and It's ok to not coocook for a few mins until soft and use packet in4.Add your stir fry sauce, stir until coated well This is a quick m", "5.Serve & Enjoy! You can add any like peppers and veg packets are a 412 Calor 38g Prote 51g Carb 2g Fat"],servings:"1 serving",time:"10-15 mins",calories:"412",protein:"38"},
+  {id:19,name:"Slow Cooker Honey Sesame Chicken",tag:"Dinner",desc:"bsolutely delicious, little fakeaway on a Saturday night",ingredients:["400g chicken, diced", "2 tsp garlic puree", "1 red onion, chopped", "a few spring onions, chopped", "1 tsp chilli powder", "6 tbsp soy sauce", "5 tbsp honey", "1 tsp chinese 5 spice", "250ml chicken stock", "1 tbsp sesame oil", "1 tbsp cornflour, mixed into a", "paste with 1 tbsp water", "1 red pepper, sliced", "Slow Cooker H"],instructions:["1.Place all the ingredients, except the red pepper, in the slowThis dish is abso cooker and stir,", "2.Cook on high for 3 hours or lowPerfect for a littl for 5 hours.and put the rest", "3.Add the red pepper and cook Again a slow coofor another 15 minutes. all the ingredien4.Serve with your choice of rice or noodles (remember to track) Perfect on a supe5.Garnish with some spring delicious home c onions", "6.Enjoy! 312 Calori 28g Prote 35g Carb 8g Fat"],servings:"1 serving",time:"3-5 hours",calories:"312",protein:"28"},
+  {id:20,name:"Air fryer Easter Croissant Balls",tag:"Lunch",desc:"thing we eat has to be, Sometimes it's ter being this weekend I thought this",ingredients:["6 chocolate eggs (creme eggs", "are the ones counted in these", "calories, but be creative try", "some other flavours)", "1 packet of croissant pastry", "(find these in the refrigerated", "aisle with the pastry)", "1 egg, beaten", "Air fryer Easte", "instructions6 servings", "1.Wrap each chocolate egg in a", "strip of pastry so it isOk ok, this dish", "completely covered.", "But not everythi2.Roll and shape so it is a ball", "about balance,", "and fully closed.", "3.Brush with the beaten egg,", "And with easter", "4.Air-fry at 180 degrees for 8", "would be super f", "minutesdelicious,", "5.Enjoy!", "I haven't tried th", "got some eggs sq", "photoshoot to tr", "340 calo"],instructions:[],servings:"1 serving",time:"10 minutes",calories:"340",protein:""},
+  {id:21,name:"Chicken Ceasar Pitta",tag:"Lunch",desc:"r lunch ideas... give this delicious Caesar Chicken",ingredients:["1x wholemeal pitta", "100g chicken breast (shredded)", "1x slice parma ham", "1 tbsp fat free yoghurt", "10g parmesan", "1 spring onion", "Lemon", "Worcestershire Sauce", "Handful Lettuce"],instructions:["2.Shred the chicken. Mix with 1 tbsp yoghurt, spring onion, aNo problem give squeeze of lemon, gratedPitta a go, parmesan, tsp worcestershire Delicious, tasty asauce and some black pepper. Taste and adjust to your I make 3 portion preference. the fridge so I ha", "3.Toast the pitta, cut in 1/2 and open. Add in some lettuce, and spoon the filling into the pitta.  378 calorie", "4.Top with the crispy ham.43g protein", "5.Enjoy!30g carbs 8g fats"],servings:"1 serving",time:"20 minutes",calories:"378",protein:"43"},
+  {id:22,name:"Herby Yoghurt Chicken Pitta",tag:"Lunch",desc:"cious pitta idea for your lunch, ne has been my favourite so far,",ingredients:["1x wholemeal pitta", "100g chicken breast (shredded)", "1 tbsp fat free yoghurt", "fresh dill and parsley", "1 spring onion", "1/4 red pepper", "1 tsp american mustard", "1 lemon", "1/4 avocado", "instructionsHerby Yoghur", "1 serving", "1.Shred the chicken. Mix with", "1 tbsp yoghurt, spring", "Another deliciouonion, 1 tbsp chopped dill, 1", "tbsp chopped parsley, juice", "I think this one h", "of 1 lemon, 1 tsp mustard", "and season with salt andDelicious, tasty a", "pepper.", "I make 3 portion2.Toast the pitta, stuff with", "the fridge so I ha", "the chicken mix and some", "avocado.", "3.Enjoy!", "394 calori", "40g protein", "33g carbs", "10g fats"],instructions:[],servings:"1 serving",time:"20 minutes",calories:"394",protein:"40"},
+  {id:23,name:"Protein Crumpets",tag:"Breakfast",desc:"eakfast that takes minutes to lso make ahead of time and then",ingredients:["2x crumpets", "1 egg", "10g per4m whey protein", "(I used white chocolate but", "can be any flavour)", "100g white chocolate kvarg", "protein yoghurt", "50g frozen raspberries", "salty caramel callowfit", "cinammon", "instructionsProtein Crump", "1.In a bowl whisk together your1 serving", "egg and protein powder", "2. Dip the crumpets into the", "Delicous, break", "egg mixture until well coated", "prepare,", "3.Spray air fryer with fry light", "then add your crumpets, they", "You could also", "only need a couple of minutes", "just quickly hea", "cooking on each side", "4.Once cooked serve crumpets", "So perfect for m", "and top with yoghurt,", "raspberries, drizzle ofLove an airfryer", "callowfit and sprinkle ofinvention ever", "cinammon", "5.Enjoy!", "395 calorie", "31g protein", "53g carbs", "6.2g fat"],instructions:[],servings:"1 serving",time:"10 minutes",calories:"395",protein:"31"},
+  {id:24,name:"Biscoff Blended Oats",tag:"Breakfast",desc:"eard of overnight oats, heard of blended oats,",ingredients:["50g oats", "100g aldi plain protein yoghurt", "50g frozen raspberries", "15g biscoff spread", "5g coconut oil", "dash almond milk", "flav drops (optional)", "cinnamon", "instructionsBiscoff Blende", "1.Add oats, yoghurt, dash of1 serving", "almond milk, flav drops to a", "blended", "You'll have hear", "2.Blend all together", "3.Add to tupperware", "But have you he", "4.Add biscoff spread and", "coconut oil to a microwavable", "It's basically the", "dish and heat until melted", "together,", "together", "5.Top your oats mixture", "So if your not a", "6.Pop in fridge overnight to setthese are perfec", "7.Top with your rapsberries", "and a sprinkle of cinnamon", "8.Enjoy!", "422 calori", "21g protein", "48g carbs", "16g fat"],instructions:[],servings:"1 serving",time:"10 minutes",calories:"422",protein:"21"},
+  {id:25,name:"Mango and White Chocolate Protein Oats",tag:"Breakfast",desc:"w about you but I just feel like es like summer in a bowl.",ingredients:["60g oats", "150g milk", "15g white chocolate per4m", "protein", "50g mango", "20g white chocolate", "5g chia & flax seeds", "instructionsMango and Wh", "1 serving", "1.Mix your oats with milk,", "give a good stir and cook,", "I cook mines in theI don't know a", "mango tastes lmicrowave for quickness", "2.Once oats are cooked", "I've been cravi", "leave to cool then add", "that little spri", "your protein powder and", "has been curb", "give a good mix", "3.Top with mango, white", "Topped with s", "chocolate, chia and flax", "some health", "seeds", "4.Enjoy!", "440 calori", "23g protein", "55g carbs", "13g fat"],instructions:[],servings:"1 serving",time:"10 minutes",calories:"440",protein:"23"},
+  {id:26,name:"5% Burgers with feta, bacon & chilli jam",tag:"Dinner",desc:"ood burger and this is a eekend meal for us while",ingredients:["5% beef burger (aldi)", "2x bacon medallions", "10g feta cheese", "15g nando's chilli jam", "brioche burger bun", "150g white potatoes", "lettuce", "onion"],instructions:["1.Half your burger in two, make two balls and flatten down so 5% Burgers wiyou have 2 patties,", "2.Cook burgers in air fryer 180 1 serving degrees for around 12-15 minutes,", "3.For your potatoes chop into We love a goo chips, microwave for a few mins frequent week till soft them cook in your air Steven is on pfryer 200 degrees for roughly 20 minutes Aldi 5% beef b4.Cook your bacon in the air fryer for around 10 minutes until crispyServe with air", "5.Toast your buns in the toaster,", "6.Grab some tin foil, pop you bun in foil, add salad, burgers, bacon, feta and then your chilli jam 575 calorie 49g protein7.Serve with your chips, 61g carbs8.Enjoy! 13g fat"],servings:"1 serving",time:"20-25 minutes",calories:"575",protein:"49"},
+  {id:27,name:"Airfryer Lemon Chicken",tag:"Dinner",desc:"irfryer recipe at the moment, licious fakeaway,",ingredients:["450g chicken breast", "2 heaped tbsp cornflour", "1 tsp garlic powder", "2 tsp ground ginger", "frylight", "1 lemon", "3 tbsp honey", "100ml chicken stock", "3 tbsp soy sauce", "3 tsp garlic puree", "spring onion", "sesame seeds"],instructions:["1.Combine the cornflour, garlic Airfryer Lemon powder and 1 tsp ground ginger in a bowl and toss the 3 servings chicken in this mix.", "2.Add to an airfryer with about Loving an airf20 sprays of frylight, cook at 200 degrees for 20 minutes. This is a delic3.For the sauce, juice of 1 lemon, honey, chicken stock, soy sauce, garlic puree and 1 tspBut it is also p ground ginger to a pan and cook over a high heat until itDoesn't take lo starts to thicken.3 portions sor", "4.Coat the chicken in the sauce in the pan before serving.", "5.I served mines with 200g 319 caloriebasmati rice and 100g green 38g protein beans, top with spring onion 34g carbs and sesame seeds 5g fat", "6.Enjoy!"],servings:"1 serving",time:"20 minutes",calories:"319",protein:"38"},
+  {id:28,name:"Chicken and Pesto Rice",tag:"Dinner",desc:"simplest and easiest meal prep, gredients and tasty,",ingredients:["150g chicken breast", "20g reduced fat green pesto", "200g basmati rice", "100g green beans", "instructionsChicken and P", "1.Cook your chicken in the1 serving", "air fryer 180 degress for", "around 20 minutes, seasonThis is the sim", "with some salt and pepper", "2.Cook your rice accordingMinimal ingre", "to packet instructions", "Bulk up ingred3.Boil green beans for a few", "minutesone portion", "4.In a bowl add chicken,", "rice and pesto and give a", "good mix", "5.Add to your tupperware", "with your green beans 544 calori", "45g protein", "6.Enjoy!", "72g carbs", "8g fat"],instructions:[],servings:"1 serving",time:"20 minutes",calories:"544",protein:"45"},
+  {id:29,name:"Chicken and Cheese Chipotle Wraps",tag:"Lunch",desc:"r fryer recipe, per, easy quick lunch idea,",ingredients:["5 mini wraps", "180g cooked chicken, shredded", "frank's chipotle sauce", "60g grated reduced fat-", "mozzarella", "frylight", "instructionsChicken and C", "1Makes 5", "1.Lay out the wraps and add", "the chicken, sauce and", "cheese into the middle ofAnother air fr", "each,", "This is a super", "2.Roll or fold the sides", "tightly to create a rolled", "5 minutes to p", "parcel,", "3.Spray all over with low-", "calorie spray and air-fry at", "200 degrees for 5 minutes", "4.Enjoy!", "169 calorie", "16g protein", "18g carbs", "4g fat"],instructions:[],servings:"1 serving",time:"5 mins",calories:"169",protein:"16"},
+  {id:30,name:"Chicken Quesadilla",tag:"Lunch",desc:"quick dinner and is pretty make for lunch,",ingredients:["200g chicken", "1/2 packet old el paso smoky", "bbq seasoning", "1/2 red onion", "1/2 pepper", "handful mushrooms", "20g reduced fat cheese", "tortilla wrap"],instructions:["1.In a heated pan fry your Makes 1 chicken with some frylight", "2.Once chicken is sealed add Super easy, qu onions, peppers & mushrooms tasty. and cook until soft", "3.Add the fajita seasoning an let Could also ma cook for 10-15 minutes", "4.Add chicken mix to once half I make mines of a wrap you don't have", "5.Grate some cheese on top, fold airfryer over wrap and cook for a few minutes in the foreman until crispy", "6.Enjoy! 593 calorie 65g protein 56g carbs 12g fat"],servings:"1 serving",time:"15 minutes",calories:"593",protein:"65"},
+  {id:31,name:"Chicken Foaccacia",tag:"Lunch",desc:"ick, simple lunch idea of 10 we are really busy at",ingredients:["150g chicken", "1/2 packet colmans chicken", "kebab seasoning", "1x sliced foccaccia", "50g tzatziki", "Salad of your choice", "instructionsChicken Foacc", "Makes 1", "1.In a bowl add your chicken", "and seasoning, mix well then", "Another quick", "cook (I cook mines in the air", "fryer)", "9 times out of", "2.To assemble your foccacia,lunchtime so w", "3.Toast the foccacia, spread onstanding arou", "your tzatziki,masterpiece,", "4.Top with salad and chicken", "5.Enjoy!We just need", "tasty, make yo", "save yourself e", "466 calori", "47g protein", "41g carbs", "12g fat"],instructions:[],servings:"1 serving",time:"10 minutes",calories:"466",protein:"47"},
+  {id:32,name:"Protein Pancakes with Yoghurt & Raspberries",tag:"Breakfast",desc:"om Aldi, I'd give them a try,",ingredients:["100g mini protein pancake", "bites", "100g 0% fage greek yoghurt", "50g frozen raspberries", "chocolate callowfit", "sprinkle cinammon", "instructionsProtein Pancake", "Choco Sauce", "Makes 11.Weigh out pancakes on a", "plate and pop inFinally got my", "microwave for a minutepancakes from", "2.Add your greek yoghurt", "So thought I'dto plate", "I had these as", "3.Top with raspberries", "Could also ha4.Drizzle your chcolate", "cheeky dessert", "callowfit (can substitute", "for nutella if your calories", "You could add", "allow)", "greek yoghurt", "5.Sprinkle with some", "bump", "cinammon", "342 calori6.Enjoy!", "24g protein", "38g carbs", "10g fat"],instructions:[],servings:"1 serving",time:"5 minutes",calories:"342",protein:"24"},
+  {id:33,name:"Chicken & Chilli Jam Wraps",tag:"Lunch",desc:"illi jam is good, licious, hot wrap, again I toast",ingredients:["150g chicken breast", "tortilla wrap", "1/4 red pepper", "20g light mayo", "15g nando's chilli jam", "instructionsChicken & Chi", "1.Lay out the wraps and add", "Makes 1", "the chicken, sauce and", "pepper into the middle ofNando's chilli", "each,", "This is a delic2.Roll or fold the sides", "mines in the gtightly to create a rolled", "be made in thparcel,", "3.Spray all over with low-", "Again cook yo", "calorie spray and cook in", "ready to go or", "foreman until crispy.", "chicken for ea", "4.Enjoy!", "423 calori", "42g protein", "38g carbs", "11g fat"],instructions:[],servings:"1 serving",time:"10 minutes",calories:"423",protein:"42"},
+  {id:34,name:"Homemade Chicken Chasni",tag:"Breakfast",desc:"r favourite takeaway curry's lot more macro friendly,",ingredients:["400g chicken breast", "500g passata", "100g mango chutney", "125g fage 0% greek yoghurt", "1x red onion", "1 tbsp curry powder", "1 tbsp tandoori powder", "1 tbsp tumeric", "1 tsp garlic puree", "1 tsp chilli puree"],instructions:["4.Season with some salt and pepper and allow to cook for around 15-20 Serving below minutes. make sure to a5.Once sauce has thickened add serve it with wyour greek yoghurt and stir constantly.breads or chap", "6. Servce your choice of nan bread, rice or chapati's 232 calorie", "7.Enjoy!30g protein 23g carbs 2g fat"],servings:"1 serving",time:"30 minutes",calories:"232",protein:"30"},
+  {id:35,name:"Greek Chicken Flatbread",tag:"Lunch",desc:"nch ideas this month, g out all different flatbreads",ingredients:["150g chicken", "italian seasoning", "greek style flatbread", "50g tzatziki", "salad of your choice", "instructionsGreek Chicken", "1.Cook your chicken prior,Makes 1", "I mix with some italian", "seasoning and cook in theLoads of lunch", "airfryer", "I love trying o", "2.For flatbread you can heat", "etc,", "under grill or for", "quickness I cut in half and", "My lunches ar", "pop in toaster", "normally just", "3.Spread on your tzatziki", "4.Top with salad of your", "So here's anot", "choice and chicken", "5.Enjoy!", "425 calori", "47g protein", "33g carbs", "10g fat"],instructions:[],servings:"1 serving",time:"10 minutes",calories:"425",protein:"47"},
+  {id:36,name:"Chicken, Chorizo Mac & Cheese",tag:"Dinner",desc:"eese but with an extra added so good,",ingredients:["75g dry macaroni pasta", "25g light mozzarella", "100g raw chicken breast", "90g light philadelphia", "20g reduced fat cheddar", "10g parmesan", "2 slices of wafer thin chorizo", "1 chicken stock cube", "salt/pepper/garlic to taste"],instructions:["1.Cook the mac pasta as per the package instructions, then drain Chicken, Chor2.Cook chicken breast until fully done and cut into small pieces", "3.In a pot add chicken stock,Makes 1 light philadelphia, light mozzarella, cheddar andMac and chee parmesan. Stir until the cheesesprotein kick, are fully melted and the mixture is creamy. This dish is so", "4.Add the cooked chicken, chorizo slices into the sauce Perfect family mix and stir well. meals", "5.Add pasta to sauce mix along with salt/pepper/garlic and pour into an ovenproof dish", "6.Top with remaining cheddar and chorizo slices and cook 687 calori 58g proteinunder the grill for 10 minutes 56g carbsuntil crispy 28g fat", "7.Enjoy!"],servings:"1 serving",time:"30 minutes",calories:"687",protein:"58"},
+  {id:37,name:"Korean Sticky Beef with Rice",tag:"Dinner",desc:"acker of a meal prep dish, tion for dinner and stick the",ingredients:["600g 5% beef mince", "garlic powder", "onion powder", "100ml light soy sauce", "20g light butter", "20g honey", "1 tbsp garlic puree", "1 tbsp sriracha", "1 tbsp sesame oil", "spring onions", "sriracha mayo to drizzle", "200g uncooked basmati rice", "salt and pepper to taste", "Korean Sticky instructions", "1.In a large bowl add your mince,", "Makes 5garlic powder, onion powder,", "pepper, sesame oil & 30ml soy", "sauce - give it a good mixThis is a crack", "together", "2.Then cook over a high heatMake a portio", "until mince is browned", "other 4 away,", "3.Remove mince from pan", "4.Add butter to pan, along with", "You could bul", "sriracha, garlic puree, light soy", "i.e peppers, sp", "sauce & honey - mix together", "until combined- whatever tak", "5.Add the cooked beef to pan give", "it a good mix, then add the", "spring onions", "390 calori", "6.Serve with cooked basmati rice34g protein", "7.Enjoy!", "37g carbs", "9g fat"],instructions:[],servings:"1 serving",time:"25 minutes",calories:"390",protein:"34"},
+  {id:38,name:"Apple Crumble Overnight Oats",tag:"Breakfast",desc:"the go breakfast or you could cheeky dessert,",ingredients:["40g oats", "1 pink lady apple (peeled and chopped)", "20g protein (I used caramel biscuit", "per4m)", "60ml semi skimmed milk", "100g low fat custard", "50g fat free greek yoghurt", "1x biscoff cookie", "cinammon", "1 tsp stevia"],instructions:["1.In a bowl add your chopped apples, tsp water, stevia and cinammon, give it a good mixApple Crumbl then pop in micro for around 3 minutes - stirring halfwayMakes 1 through", "2.In a tub add your oats,Perfect on the protein and milk - mixhave it as a ch altogether then once apples are cooked add to your oat I have a massi mixture with a little bit of sweet to try cu your custard", "3.To make the topping mix Plus I love oat together greek yoghurt and your remaining custard and spread on top of oats", "4.Put in fridge overnight", "5.Crush biscoff cookie on top 491 calorie before eating 31g protein", "6.Enjoy!75g carbs 7g fat"],servings:"1 serving",time:"10 minutes",calories:"491",protein:"31"},
+  {id:39,name:"Biscoff Weetabix Cheesecake Jar",tag:"Breakfast",desc:"sn't even the word for this at the minute,",ingredients:["1.5 weetabix", "150g greek yoghurt", "15g per4m whey (salted", "caramel or caramel biscuit)", "10g biscoff spread", "1x biscoff cookie", "50ml almond milk"],instructions:["1.Crush weetabix into jar, add almond milk and mix Biscoff Weetab together then flatten down.", "2.In a bowl add greek Makes 1 yoghurt and whey protein mix together until smooth.Obsessed isn't", "3.Add biscoff spread to a microwaveable dish and I look forwheat until melted", "4.Add to your yoghurt and Perfect as a bre whey mixture and stir until dcombined", "5.Top weetabix mix with the You can also m yoghurt mixture and put in to make it as b fridge overnight", "6.Crush biscoff cookie on 342 calori 31g proteintop before serving 39g carbs", "7.Enjoy! 7g fat"],servings:"1 serving",time:"5 minutes",calories:"342",protein:"31"},
+  {id:40,name:"Chocolate Orange Baked Oats",tag:"Breakfast",desc:"bsolutely to die for! ing chocolate cake for",ingredients:["50g oats", "10g cocoa powder", "1 scoop per4m chocolate", "orange whey protein", "100ml almond", "50g fage 0% yoghurt", "17.5g terrys chocolate orange", "bar"],instructions:["1.Heat oven to 180 degrees", "2.In a blender add oats, 20g Chocolate Oraprotein, cocoa powder and almond milk, blend all together until smoothMakes 1", "3.Spray ramekin with fry These are abso light then add half your mixture, pop your terrys It\u2019s like eating chocolate orange segment breakfast, in the middle, then top with remaining mixture It\u2019s the perfect", "4.Cook in oven for 15 chocolate oran minutes", "5.Make frosting for the top by mixing greek yoghurt and remaining 10g protein 472 calori powder together35g protein", "6.Top oats with frosting &58g carbs 12g fatenjoy!"],servings:"1 serving",time:"20 minutes",calories:"472",protein:"10"},
+  {id:41,name:"Apple Cinammon Protein Pancakes",tag:"Breakfast",desc:"on top just make them that bit e I pretty always use the same",ingredients:["20g jumbo oats", "1x banana", "1 pink lady apple", "1 scoop caramel biscuit per4m protein", "powder", "1 large egg", "100g fage 0% yoghurt", "50ml almond milk", "Zero cal syrup", "Cinammon"],instructions:["1.In a blender combine oats, banana, protein powder, egg,Apple Cinamm baking powder & almond milk, blend together until a Makes 1 Serv smooth thick paste", "2.Heat a pan over a medium Delicious set oheat", "3.Spray with some frylight andhot apples on cook your pancakes for asweeter, couple of mins on each side", "4.Whilst pancakes are cookingYou\u2019ll notice I peel & chop apple, add a littleingredients fo water and some cinammonchange the pro and cook in microwave untilthe toppings soft", "5.Stack pancakes and top with greek yoghurt, chopped 521 calorie apples, some zero cal syrup44g protein and more cinammon69g carbs 9g fat6.Enjoy!"],servings:"1 serving",time:"15 minutes",calories:"521",protein:"44"},
+  {id:42,name:"Red Velvet Protein Pancakes",tag:"Breakfast",desc:"ncake day, e I pretty always use the same",ingredients:["20g jumbo oats", "1x banana", "50g raspberries", "1 scoop red velvet per4m protein", "powder", "1 large egg", "100g fage 0% yoghurt", "50ml almond milk", "pinch of taste caramel sauce", "vanilla flavour drops"],instructions:["1.In a blender combine oats, banana, protein powder, egg,Red Velvet Pro baking powder & almond milk, blend together until a Makes 1 Serv smooth thick paste", "2.Heat a pan over a medium Delicious set oheat", "3.Spray with some frylight andtime for panca cook your pancakes for a You\u2019ll notice Icouple of mins on each side", "4.Whilst pancakes are cookingingredients fo mix your yoghurt with somechange the pro flav drops and defrostthe toppings raspberries in the microwave", "5.Stack pancakes and top with greek yoghurt, raspberries and pinch of taste caramel 491 calorie sauce.49g protein", "6.Enjoy!56g carbs 9g fat"],servings:"1 serving",time:"15 minutes",calories:"491",protein:"49"},
+  {id:43,name:"Joe & the juice Chicken Avo Pitta",tag:"Lunch",desc:"an overpriced pitta when in e absolutely did,",ingredients:["1 warburtons wholemeal soft", "pitta", "40g reduced fat mozzarella", "10g reduced fat green pesto", "20g avocado", "100g chicken breast", "tomatoes (optional if you like", "them)"],instructions:["1.Heat up your george foreman or toastie grill1 Serving", "2.Slice your pitta in half,", "3.Spread on your pesto then Did we buy an top with avocado, Brighton? We mozzarella & chicken", "4.Pop on the top of your It was nice bu pitta & put into your nice a one at h foreman for a few minutes price tag until it starts to go nice and crispyIt\u2019s the perfect", "5.Enjoy! 441 calorie 46g protein 29g carbs 14g fat"],servings:"1 serving",time:"15 minutes",calories:"441",protein:"46"},
+  {id:44,name:"White Chocolate & Raspberry Baked Oat Traybake",tag:"Breakfast",desc:"te perfect way to meal prep wild with the flavours,",ingredients:["2 bananas", "200g oats (I use jumbo oats)", "80g protein (I used per4m", "cereal milk)", "1 tsp baking powder", "400ml milk", "80g frozen raspberries", "30g milky bar buttons", "60g peanut butter", "3 tbsp raspberry jam", "100g 0% fat greek yoghurt", "White Chocolawith 10g protein mixed", "Traybake"],instructions:["1.Mash up banana in a bowl", "2. Add oats, protein powder, The absolute p baking powder & milk your oats,", "3.Mix until combined, then add your raspberries & You can go wi white chocolate", "4.Place in a lined baking trayServe with som & cook in oven for 15 minsdelicous break at 180 degrees", "5.Once ready chop up into 322 calorie slices and place in 18g protein Tupperware 34g carbs", "6.Top with yoghurt once11g fat serving"],servings:"1 serving",time:"20 minutes",calories:"322",protein:"18"},
+  {id:45,name:"Chicken Muffin Meal Prep",tag:"Dinner",desc:"at it\u2019s finest, these are bloody etter than McDonald\u2019s",ingredients:["10 chicken sausages", "4 English muffins", "Pepper", "Sliced Cheese", "Rocket", "Tomato (chopped)", "Spring Onion (chopped)", "Fresh basil (chopped)"],instructions:["1.place sausages in a bowl, season with black pepper and use a spatula to break up.Chicken Muffi", "2.Cut muffins in half and toast lightly (1 min) 4 Servings", "3.Heat a pan over medium heat, use a spoon to scoop out sausage and place in pan,Meal prep at i press down to make into aamazing - bett patty and fry on both sides.Mcmuffins IM", "4.Place all salad into a bowl & mix wellPrep on a sund", "5.Once muffins are toasted, topeveryday! with salad, chicken pattys & cheese.", "6.Wrap in tin foil, and once cooled place in fridge", "7.To heat: you can either heat 322 calorie in a microwave or air fryer 22g protein until hot throughout 33g carbs 12g fat"],servings:"1 serving",time:"15 minutes",calories:"322",protein:"22"},
+  {id:46,name:"Blueberry & Peanut Butter Baked Oat Tray Bake",tag:"Breakfast",desc:"vour variation of the baked y have one when you can have",ingredients:["2 bananas", "200g oats (I use jumbo oats)", "80g protein (I used per4m", "chocolate peanut butter)", "1 tsp baking powder", "400ml milk", "100g blueberries", "1 bar aldi 70% dark chocolate", "60g peanut butter", "1 tbsp cocoa powder", "100g 0% fat greek yoghurt with", "10g protein mixed", "Blueberry & Pe"],instructions:["1.Mash up banana in a bowl6 Servings", "2.Add oats, protein powder, cocoa powder, baking powder Another flavo & milk oat tray bake,", "3.Mix until combined, then add your blueberries & dark Because why h chocolate two,", "4.Place in a lined baking tray, spread peanut butter on top & Their so good cook in oven for 15 mins at 180 them a try! degrees", "5.Once ready chop up into slices and place in Tupperware 384 calori", "6.Top with yoghurt once serving 34g protein 42g carbs 9g fat"],servings:"1 serving",time:"20 minutes",calories:"384",protein:"34"},
+  {id:47,name:"Steak with Chinese Curry Sauce",tag:"Dinner",desc:"imal ingredient dinner, Mid-Week when time is short,",ingredients:["Aldi Sirloin Steak", "200g Basmati Rice (cooked", "weight)", "100g Youngs Curry Sauce", "Spring Onions (chopped)"],instructions:["1.Cook steak in air fryer to your preference (medium1 Serving is my choice)", "2.Use a microwave pouch of Quick, minim rice for quickness,", "3.Make up your chinese Perfect for Mi curry sauce with water,", "4.Pop rice into a bowl, sliceWho doesn\u2019t l steak & top rice, drizzle with curry sauce, garnish with spring onions", "5.Enjoy! 363 calorie 24g protein 30g carbs 16g fat"],servings:"1 serving",time:"15 minutes",calories:"363",protein:"24"},
+];
+}
+function renderHolly(filterText='', filterTag='All'){
+  const q = filterText.toLowerCase().trim();
+  const filtered = state.hollyRecipes.filter(r=>{
+    const matchTag = filterTag==='All' || r.tag===filterTag;
+    const matchQ = !q || r.name.toLowerCase().includes(q) || (r.desc||'').toLowerCase().includes(q) || (r.ingredients||[]).join(' ').toLowerCase().includes(q);
+    return matchTag && matchQ;
+  });
+
+  const tags = ['All','Breakfast','Lunch','Dinner','Snack'];
+  let html=`<div style="margin-bottom:1.25rem;display:flex;flex-direction:column;gap:10px">
+    <input type="text" id="hollySearch" placeholder="Search recipes e.g. overnight oats, chicken, pasta..." 
+      oninput="renderHolly(this.value, document.getElementById('hollyTagFilter').value)"
+      value="${filterText.replace(/"/g,'&quot;')}"
+      style="background:var(--surface2);border:1px solid var(--border2);color:var(--text);font-family:'DM Sans',sans-serif;font-size:14px;padding:10px 14px;border-radius:var(--radius);outline:none;width:100%;box-sizing:border-box"/>
+    <div style="display:flex;gap:6px;flex-wrap:wrap">
+      <select id="hollyTagFilter" onchange="renderHolly(document.getElementById('hollySearch').value, this.value)"
+        style="background:var(--surface2);border:1px solid var(--border2);color:var(--text);font-family:'DM Sans',sans-serif;font-size:13px;padding:7px 12px;border-radius:var(--radius);outline:none;appearance:none;cursor:pointer">
+        ${tags.map(t=>`<option value="${t}" ${filterTag===t?'selected':''}>${t}</option>`).join('')}
+      </select>
+      <span style="font-size:13px;color:var(--muted);padding:7px 0">${filtered.length} recipe${filtered.length!==1?'s':''}</span>
+    </div>
+  </div>`;
+
+  if(!filtered.length){
+    html+=`<div class="favs-empty"><span>🔍</span><p>No recipes match "${filterText}".<br>Try a different search.</p></div>`;
+  } else {
+    html+=`<div class="recipe-grid">`;
+    filtered.forEach(r=>{
+      const cal = r.calories||(r.macros&&r.macros.calories)||'';
+      const prot = r.protein||(r.macros&&r.macros.protein)||'';
+      const calLabel = cal ? `${cal} kcal` : '';
+      const protLabel = prot ? `${prot}g P` : '';
+      html+=`<div class="recipe-card" onclick="showRecipeDetail(${r.id})">
+        <div class="recipe-tag">${r.tag}</div><h3>${r.name}</h3><p>${(r.desc||'').slice(0,80)}</p>
+        <div class="recipe-macros">
+          ${calLabel?`<span class="recipe-macro" style="color:var(--orange)">${calLabel}</span>`:''}
+          ${protLabel?`<span class="recipe-macro">${protLabel}</span>`:''}
+          ${r.time?`<span class="recipe-macro">${r.time}</span>`:''}
+        </div>
+      </div>`;
+    });
+    html+=`</div>`;
+  }
+  html+=`<div style="margin-top:1rem"><div class="add-recipe-btn" onclick="openAddRecipe()">+ Add Holly's recipe</div></div>`;
+  document.getElementById('hollyOutput').innerHTML=html;
+}
+function showRecipeDetail(id){
+  const r=state.hollyRecipes.find(x=>x.id===id);if(!r)return;
+  // Support both old format (macros.calories) and new format (calories directly)
+  const cal = r.calories || (r.macros && r.macros.calories) || '';
+  const prot = r.protein || (r.macros && r.macros.protein) || '';
+  const carbs = (r.macros && r.macros.carbs) || '';
+  const fat = (r.macros && r.macros.fat) || '';
+  const macroHtml = [
+    cal ? `<span class="pill cal">${cal} kcal</span>` : '',
+    prot ? `<span class="pill">${prot}g protein</span>` : '',
+    carbs ? `<span class="pill">${carbs}g carbs</span>` : '',
+    fat ? `<span class="pill">${fat}g fat</span>` : '',
+    r.time ? `<span class="pill">${r.time}</span>` : '',
+    r.servings && r.servings!=='1 serving' ? `<span class="pill">${r.servings}</span>` : '',
+  ].filter(Boolean).join('');
+  const ingList = (r.ingredients||[]).map(i=>`<li style="font-size:13px;color:var(--text);padding:5px 0;border-bottom:1px solid var(--border)">• ${i}</li>`).join('');
+  const stepsList = (r.instructions||[]).length 
+    ? `<div class="section-label" style="margin-bottom:6px;margin-top:1rem">Instructions</div><ol style="padding-left:1.25rem;margin-bottom:1rem">${(r.instructions||[]).map(s=>`<li style="font-size:13px;color:var(--muted);padding:4px 0;line-height:1.5">${s}</li>`).join('')}</ol>`
+    : r.prep ? `<div class="section-label" style="margin-bottom:6px">How to make it</div><p style="font-size:13px;color:var(--muted);line-height:1.6;margin-bottom:1rem">${r.prep}</p>` : '';
+  showModal(`<h2>${r.name}</h2>
+    <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:1rem">${macroHtml}</div>
+    <p style="font-size:13px;color:var(--muted);margin-bottom:1rem">${r.desc||''}</p>
+    <div class="section-label" style="margin-bottom:8px">Ingredients</div>
+    <ul style="list-style:none;margin-bottom:0.5rem">${ingList}</ul>
+    ${stepsList}
+    <div style="display:flex;gap:8px;margin-top:1rem">
+      <button class="btn-secondary" onclick="saveRecipeToFav(${id});document.getElementById('modal').style.display='none'">♥ Save to favourites</button>
+      <button class="btn-danger" onclick="deleteRecipe(${id})">Delete</button>
+    </div>`);
+}
+function saveRecipeToFav(id){
+  const r=state.hollyRecipes.find(x=>x.id===id);if(!r)return;
+  const meal={type:r.tag,name:r.name,ingredients:r.ingredients,macros:r.macros,prep:r.prep};
+  if(state.favourites.some(f=>f.name===meal.name)){toast('Already in favourites');return;}
+  state.favourites.push(meal);saveState();toast('Saved to favourites ♥');
+}
+function deleteRecipe(id){
+  state.hollyRecipes=state.hollyRecipes.filter(r=>r.id!==id);
+  saveState();document.getElementById('modal').style.display='none';renderHolly();toast('Recipe deleted');
+}
+function openAddRecipe(){
+  const inp=(id,ph,type='text')=>`<input type="${type}" id="${id}" placeholder="${ph}" style="background:var(--surface2);border:1px solid var(--border2);color:var(--text);font-family:'DM Sans',sans-serif;font-size:14px;padding:9px 12px;border-radius:var(--radius);width:100%;outline:none"/>`;
+  const ta=(id,ph)=>`<textarea id="${id}" rows="3" placeholder="${ph}" style="background:var(--surface2);border:1px solid var(--border2);color:var(--text);font-family:'DM Sans',sans-serif;font-size:14px;padding:9px 12px;border-radius:var(--radius);width:100%;outline:none;resize:vertical"></textarea>`;
+  showModal(`<h2>ADD RECIPE</h2>
+    <div style="display:grid;gap:10px;margin-top:.5rem">
+      <div class="field"><label>Category</label>
+        <select id="ar-tag" style="background:var(--surface2);border:1px solid var(--border2);color:var(--text);font-family:'DM Sans',sans-serif;font-size:14px;padding:9px 12px;border-radius:var(--radius);width:100%;outline:none">
+          <option>Breakfast</option><option>Lunch</option><option>Dinner</option><option>Snack</option>
+        </select></div>
+      <div class="field"><label>Recipe name</label>${inp('ar-name','e.g. Protein pancakes')}</div>
+      <div class="field"><label>Description</label>${inp('ar-desc','Short description...')}</div>
+      <div class="field"><label>Ingredients (one per line)</label>${ta('ar-ing','150g oats\n30g protein\n200ml milk')}</div>
+      <div class="field"><label>How to make it</label>${ta('ar-prep','One or two sentences...')}</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:8px">
+        <div class="field"><label>Cals</label>${inp('ar-cal','450','number')}</div>
+        <div class="field"><label>Protein</label>${inp('ar-prot','35','number')}</div>
+        <div class="field"><label>Carbs</label>${inp('ar-carbs','40','number')}</div>
+        <div class="field"><label>Fat</label>${inp('ar-fat','10','number')}</div>
+      </div>
+      <button class="btn-primary" onclick="submitRecipe()">Save recipe</button>
+    </div>`);
+}
+function submitRecipe(){
+  const name=document.getElementById('ar-name').value.trim();
+  const desc=document.getElementById('ar-desc').value.trim();
+  const ing=document.getElementById('ar-ing').value.trim().split('\n').filter(Boolean);
+  const prep=document.getElementById('ar-prep').value.trim();
+  const cal=+document.getElementById('ar-cal').value;
+  const prot=+document.getElementById('ar-prot').value;
+  const carbs=+document.getElementById('ar-carbs').value;
+  const fat=+document.getElementById('ar-fat').value;
+  const tag=document.getElementById('ar-tag').value;
+  if(!name||!ing.length||!prep||!cal){toast('Please fill in all fields');return;}
+  const newId=Math.max(0,...state.hollyRecipes.map(r=>r.id))+1;
+  state.hollyRecipes.push({id:newId,tag,name,desc,ingredients:ing,macros:{calories:cal,protein:prot,carbs,fat},prep});
+  saveState();document.getElementById('modal').style.display='none';renderHolly();toast('Recipe added!');
+}
+
+// ── COPY TO CLIPBOARD ──
+function copyMealPlan(){
+  if(!state.lastGenerated||!state.lastGenerated.length){toast('Generate a meal plan first');return;}
+  var targets = state.lastMacroTargets||{};
+  var lines = [];
+  lines.push('NOVA MEAL PLAN');
+  lines.push('==============');
+  if(targets.calories) lines.push('Daily targets: '+targets.calories+' kcal | '+targets.protein+'g protein | '+targets.carbs+'g carbs | '+targets.fat+'g fat');
+  lines.push('');
+  state.lastGenerated.forEach(function(m){
+    lines.push(m.type.toUpperCase()+': '+m.name);
+    lines.push('Calories: '+m.macros.calories+' kcal | Protein: '+m.macros.protein+'g | Carbs: '+m.macros.carbs+'g | Fat: '+m.macros.fat+'g');
+    lines.push('Ingredients: '+m.ingredients.join(', '));
+    lines.push('Prep: '+m.prep);
+    lines.push('');
+  });
+  var text = lines.join('\n');
+  if(navigator.clipboard && navigator.clipboard.writeText){
+    navigator.clipboard.writeText(text).then(function(){
+      toast('Meal plan copied to clipboard!');
+    }).catch(function(){
+      fallbackCopy(text);
+    });
+  } else {
+    fallbackCopy(text);
+  }
+}
+
+function fallbackCopy(text){
+  var ta = document.createElement('textarea');
+  ta.value = text;
+  ta.style.position='fixed';ta.style.opacity='0';
+  document.body.appendChild(ta);
+  ta.focus();ta.select();
+  try{ document.execCommand('copy'); toast('Meal plan copied!'); }
+  catch(e){ toast('Could not copy — try long-pressing the text'); }
+  document.body.removeChild(ta);
+}
+
+// ── PDF DOWNLOAD ──
+function downloadMealPDF(){
+  if(!state.lastGenerated||!state.lastGenerated.length){toast('Generate a meal plan first');return;}
+  var targets = state.lastMacroTargets||{};
+  var meals = state.lastGenerated;
+
+  // Build totals
+  var totals = meals.reduce(function(a,m){
+    return {cal:a.cal+m.macros.calories, prot:a.prot+m.macros.protein, carbs:a.carbs+m.macros.carbs, fat:a.fat+m.macros.fat};
+  },{cal:0,prot:0,carbs:0,fat:0});
+
+  var date = new Date().toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+
+  var mealRows = meals.map(function(m){
+    return '<div style="margin-bottom:20px;padding-bottom:20px;border-bottom:1px solid #e5e5e5">'
+      +'<div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px">'
+      +'<div><span style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:#f97316">'+m.type+'</span>'
+      +'<h3 style="font-size:16px;font-weight:600;color:#111;margin:3px 0 0">'+m.name+'</h3></div>'
+      +'<div style="text-align:right;flex-shrink:0;margin-left:16px">'
+      +'<span style="background:#fff3e8;border:1px solid #f97316;color:#f97316;font-size:11px;font-weight:600;padding:3px 8px;border-radius:4px">'+m.macros.calories+' kcal</span>'
+      +'</div></div>'
+      +'<div style="display:flex;gap:8px;margin-bottom:8px;flex-wrap:wrap">'
+      +'<span style="font-size:11px;background:#f5f5f5;border:1px solid #ddd;color:#555;padding:2px 8px;border-radius:4px">'+m.macros.protein+'g protein</span>'
+      +'<span style="font-size:11px;background:#f5f5f5;border:1px solid #ddd;color:#555;padding:2px 8px;border-radius:4px">'+m.macros.carbs+'g carbs</span>'
+      +'<span style="font-size:11px;background:#f5f5f5;border:1px solid #ddd;color:#555;padding:2px 8px;border-radius:4px">'+m.macros.fat+'g fat</span>'
+      +'</div>'
+      +'<p style="font-size:12px;color:#444;margin:0 0 6px"><strong>Ingredients:</strong> '+m.ingredients.join(', ')+'</p>'
+      +'<p style="font-size:12px;color:#666;margin:0"><strong>Method:</strong> '+m.prep+'</p>'
+      +'</div>';
+  }).join('');
+
+  var html = '<!DOCTYPE html><html><head><meta charset="UTF-8"/>'
+    +'<title>Nova Meal Plan</title>'
+    +'<style>*{box-sizing:border-box;margin:0;padding:0}body{font-family:-apple-system,BlinkMacSystemFont,\'Segoe UI\',sans-serif;color:#111;background:#fff;padding:32px}@media print{body{padding:16px}}</style>'
+    +'</head><body>'
+    +'<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;padding-bottom:16px;border-bottom:3px solid #f97316">'
+    +'<div><div style="font-size:28px;font-weight:800;letter-spacing:2px;color:#f97316">NOVA</div>'
+    +'<div style="font-size:11px;letter-spacing:3px;color:#666;margin-top:-2px">MEAL IDEAS</div></div>'
+    +'<div style="text-align:right"><div style="font-size:12px;color:#888">'+date+'</div>'
+    +(targets.calories?'<div style="font-size:11px;color:#aaa;margin-top:2px">Target: '+targets.calories+' kcal · '+targets.protein+'g P · '+targets.carbs+'g C · '+targets.fat+'g F</div>':'')
+    +'</div></div>'
+    +'<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:28px">'
+    +'<div style="background:#fff3e8;border:1px solid #f97316;border-radius:8px;padding:12px;text-align:center"><div style="font-size:10px;text-transform:uppercase;letter-spacing:1px;color:#f97316;font-weight:600">Total calories</div><div style="font-size:22px;font-weight:700;color:#f97316;margin-top:4px">'+totals.cal+'</div></div>'
+    +'<div style="background:#f5f5f5;border:1px solid #ddd;border-radius:8px;padding:12px;text-align:center"><div style="font-size:10px;text-transform:uppercase;letter-spacing:1px;color:#666;font-weight:600">Protein</div><div style="font-size:22px;font-weight:700;margin-top:4px">'+totals.prot+'g</div></div>'
+    +'<div style="background:#f5f5f5;border:1px solid #ddd;border-radius:8px;padding:12px;text-align:center"><div style="font-size:10px;text-transform:uppercase;letter-spacing:1px;color:#666;font-weight:600">Carbs</div><div style="font-size:22px;font-weight:700;margin-top:4px">'+totals.carbs+'g</div></div>'
+    +'<div style="background:#f5f5f5;border:1px solid #ddd;border-radius:8px;padding:12px;text-align:center"><div style="font-size:10px;text-transform:uppercase;letter-spacing:1px;color:#666;font-weight:600">Fat</div><div style="font-size:22px;font-weight:700;margin-top:4px">'+totals.fat+'g</div></div>'
+    +'</div>'
+    +mealRows
+    +'<div style="margin-top:24px;padding-top:16px;border-top:1px solid #e5e5e5;font-size:10px;color:#aaa;text-align:center">Generated by Nova Meal Ideas</div>'
+    +'</body></html>';
+
+  var win = window.open('','_blank');
+  if(!win){ toast('Please allow popups to download PDF'); return; }
+  win.document.write(html);
+  win.document.close();
+  win.focus();
+  setTimeout(function(){ win.print(); }, 600);
+}
+
+// ── MODAL / TOAST ──
+function showModal(html){document.getElementById('modalContent').innerHTML=html;document.getElementById('modal').style.display='flex';}
+function closeModal(e){if(e.target.id==='modal')document.getElementById('modal').style.display='none';}
+function toast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2200);}
+</script>
+</body>
+</html>
