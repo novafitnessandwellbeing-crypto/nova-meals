@@ -438,7 +438,23 @@ let activitySortField='logins';
 let activitySortDir=-1;
 
 // ── CLIENTS ──
-function getClients(){try{return JSON.parse(localStorage.getItem('nova_clients')||'[]');}catch(e){return[];}}
+// Hardcoded clients — always available on every device
+var HARDCODED_CLIENTS = [
+  {id:100, name:'Client', email:'gbayne75@gmail.com', code:'YY6844', active:true},
+];
+
+function getClients(){
+  try{
+    var stored = JSON.parse(localStorage.getItem('nova_clients')||'[]');
+    // Merge hardcoded clients with stored ones, hardcoded take priority
+    var merged = stored.slice();
+    HARDCODED_CLIENTS.forEach(function(hc){
+      var exists = merged.some(function(c){ return c.email.toLowerCase()===hc.email.toLowerCase(); });
+      if(!exists) merged.push(hc);
+    });
+    return merged;
+  }catch(e){ return HARDCODED_CLIENTS.slice(); }
+}
 function saveClients(a){localStorage.setItem('nova_clients',JSON.stringify(a));}
 function generateCode(){const c='ABCDEFGHJKLMNPQRSTUVWXYZ23456789';let s='';for(let i=0;i<6;i++)s+=c[Math.floor(Math.random()*c.length)];return s;}
 
